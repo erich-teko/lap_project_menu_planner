@@ -5,12 +5,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from db_engin import create_db_and_tables
+from models.base_data import initialize_database
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     create_db_and_tables()
+    initialize_database()
     yield
     # Shutdown (if needed)
 
