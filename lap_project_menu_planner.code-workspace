@@ -1,0 +1,33 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+  ],
+  "settings": {
+    "python.testing.pytestArgs": ["test"],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Current File",
+        "type": "python",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+      },
+      {
+        "name": "FastAPI Server",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "fastapi",
+        "args": ["dev", "main.py", "--port", "8480"],
+        "jinja": true,
+        "console": "integratedTerminal",
+      },
+    ],
+  },
+}
