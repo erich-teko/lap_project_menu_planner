@@ -208,3 +208,7 @@ __marimo__/
 
 # VS Code Workspace files
 *.code-workspace
+
+# SQLite database file
+*.db
+
