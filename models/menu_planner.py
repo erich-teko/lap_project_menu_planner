@@ -6,6 +6,7 @@ from sqlmodel import Field, SQLModel
 class EffortLevel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
+    effort_level_number: int = Field(unique=True)
     description: Optional[str] = None
 
 

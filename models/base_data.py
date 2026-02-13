@@ -9,12 +9,12 @@ def create_effort_levels():
         if session.exec(select(EffortLevel)).first():
             return  # Effort levels already exist, no need to create them again
         effort_levels = [
-            ("schnell", "Aufwand bis zu 30 Minuten"),
-            ("mittel", "Aufwand über 30 bis zu 60 Minuten"),
-            ("aufwendig", "Aufwand über 60 Minuten"),
+            ("schnell", "Aufwand bis zu 30 Minuten", 1),
+            ("mittel", "Aufwand über 30 bis zu 60 Minuten", 2),
+            ("aufwendig", "Aufwand über 60 Minuten", 3),
         ]
-        for name, description in effort_levels:
-            effort_level = EffortLevel(name=name, description=description)
+        for name, description, effort_level_number in effort_levels:
+            effort_level = EffortLevel(name=name, description=description, effort_level_number=effort_level_number)
             session.add(effort_level)
         session.commit()
 
