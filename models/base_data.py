@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from db_engin import engine
-from models.menu_planner import EffortLevel, RecipeCategory, Season
+from models.menu_planner import EffortLevel, MenuCategory, Season
 
 
 def create_effort_levels():
@@ -21,7 +21,7 @@ def create_effort_levels():
 
 def create_recipe_categories():
     with Session(engine) as session:
-        if session.exec(select(RecipeCategory)).first():
+        if session.exec(select(MenuCategory)).first():
             return  # Recipe categories already exist, no need to create them again
         categories = [
             "Pastagericht",
@@ -34,7 +34,7 @@ def create_recipe_categories():
             "Vegan",
         ]
         for name in categories:
-            category = RecipeCategory(name=name)
+            category = MenuCategory(name=name)
             session.add(category)
         session.commit()
 

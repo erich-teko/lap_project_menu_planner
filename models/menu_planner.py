@@ -9,7 +9,7 @@ class EffortLevel(SQLModel, table=True):
     description: Optional[str] = None
 
 
-class RecipeCategory(SQLModel, table=True):
+class MenuCategory(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     description: Optional[str] = None
@@ -22,16 +22,16 @@ class Season(SQLModel, table=True):
     description: Optional[str] = None
 
 
-class Recipe(SQLModel, table=True):
+class Menu(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     description: Optional[str] = None
-    category_id: Optional[int] = Field(default=None, foreign_key="recipecategory.id")
+    category_id: Optional[int] = Field(default=None, foreign_key="menucategory.id")
     effort_level_id: Optional[int] = Field(default=None, foreign_key="effortlevel.id")
     to_take_away: bool = False
     protein: float
 
 
-class RecipeSeasonLink(SQLModel, table=True):
-    recipe_id: Optional[int] = Field(default=None, foreign_key="recipe.id", primary_key=True)
+class MenuSeasonLink(SQLModel, table=True):
+    menu_id: Optional[int] = Field(default=None, foreign_key="menu.id", primary_key=True)
     season_id: Optional[int] = Field(default=None, foreign_key="season.id", primary_key=True)
