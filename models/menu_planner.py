@@ -35,3 +35,9 @@ class Menu(SQLModel, table=True):
 class MenuSeasonLink(SQLModel, table=True):
     menu_id: int = Field(foreign_key="menu.id", primary_key=True)
     season_id: int = Field(foreign_key="season.id", primary_key=True)
+
+
+class WeekDay(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True)
+    week_day_number: int = Field(unique=True)

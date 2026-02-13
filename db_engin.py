@@ -31,6 +31,12 @@ def get_all_seasons() -> list[Season]:
         return seasons
 
 
+def get_all_week_days() -> list[WeekDay]:
+    with Session(engine) as session:
+        week_days = session.exec(select(WeekDay).order_by(WeekDay.week_day_number)).all()
+        return week_days
+
+
 def get_menues(limit: int = 20) -> list[Menu]:
     with Session(engine) as session:
         menues = session.exec(select(Menu).order_by(Menu.name).limit(limit)).all()
