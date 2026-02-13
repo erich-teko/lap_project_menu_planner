@@ -18,14 +18,16 @@ endblock %} {% block content %}
             </p>
         </div>
 
-        <div class="feature-card">
-            <div class="feature-icon">🥗</div>
-            <h3>Menüsammlung</h3>
-            <p>
-                Speichern und verwalten Sie Ihre Lieblingsrezepte für eine einfache
-                Menüplanung.
-            </p>
-        </div>
+        <a href="{{ url_for('menu_collection') }}" class="feature-card-link">
+            <div class="feature-card">
+                <div class="feature-icon">🥗</div>
+                <h3>Menüsammlung</h3>
+                <p>
+                    Speichern und verwalten Sie Ihre Lieblingsrezepte für eine einfache
+                    Menüplanung.
+                </p>
+            </div>
+        </a>
     </div>
 
     <div class="cta-section">

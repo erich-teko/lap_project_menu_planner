@@ -49,3 +49,48 @@ def create_menu(menu: Menu, season_ids: list[int]) -> Menu:
             session.commit()
         session.refresh(menu)
         return menu
+
+
+def get_menus_with_details() -> list[dict]:
+    """Get all menus with their related category, effort level, and season information."""
+    with Session(engine) as session:
+        menus = session.exec(select(Menu).order_by(Menu.name)).all()
+        result = []
+
+        for menu in menus:
+            # Get category name
+            category_name = None
+            if menu.category_id:
+                category = session.get(MenuCategory, menu.category_id)
+                if category:
+                    category_name = category.name
+
+            # Get effort level name
+            effort_name = None
+            if menu.effort_level_id:
+                effort = session.get(EffortLevel, menu.effort_level_id)
+                if effort:
+                    effort_name = effort.name
+
+            # Get season names
+            season_links = session.exec(select(MenuSeasonLink).where(MenuSeasonLink.menu_id == menu.id)).all()
+            season_names = []
+            for link in season_links:
+                season = session.get(Season, link.season_id)
+                if season:
+                    season_names.append(season.name)
+
+            result.append(
+                {
+                    "id": menu.id,
+                    "name": menu.name,
+                    "description": menu.description,
+                    "category_name": category_name,
+                    "effort_name": effort_name,
+                    "protein": menu.protein,
+                    "to_take_away": menu.to_take_away,
+                    "season_names": ", ".join(season_names) if season_names else None,
+                }
+            )
+
+        return result
