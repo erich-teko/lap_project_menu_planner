@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Menüsammlung - Wochenmenüplaner{% endblock %}
+{% block content %}
+<div class="menu-collection-section">
+    <div class="page-header">
+        <h1>Menüsammlung</h1>
+        <button class="btn-primary" onclick="openModal()">+ Neues Menü erstellen</button>
+    </div>
+
+    <div class="table-container">
+        <table class="menu-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Beschreibung</th>
+                    <th>Kategorie</th>
+                    <th>Aufwand</th>
+                    <th>Protein (g)</th>
+                    <th>Zum Mitnehmen</th>
+                    <th>Saison</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if menus %}
+                    {% for menu in menus %}
+                    <tr>
+                        <td>{{ menu.name }}</td>
+                        <td>{{ menu.description or '-' }}</td>
+                        <td>{{ menu.category_name or '-' }}</td>
+                        <td>{{ menu.effort_name or '-' }}</td>
+                        <td>{{ menu.protein }}</td>
+                        <td>
+                            {% if menu.to_take_away %}
+                                <span class="badge badge-success">Ja</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Nein</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ menu.season_names or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="no-data">Keine Menüs vorhanden</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Dialog -->
+<div id="menuModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Neues Menü erstellen</h2>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <form id="menuForm" onsubmit="submitMenu(event)">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="menuName">Name *</label>
+                    <input type="text" id="menuName" name="name" required placeholder="z.B. Spaghetti Bolognese">
+                </div>
+
+                <div class="form-group">
+                    <label for="menuDescription">Beschreibung</label>
+                    <textarea id="menuDescription" name="description" rows="3" placeholder="Optionale Beschreibung des Menüs"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="menuCategory">Kategorie *</label>
+                        <select id="menuCategory" name="category_id" required>
+                            <option value="">- Bitte wählen -</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="effortLevel">Aufwand *</label>
+                        <select id="effortLevel" name="effort_level_id" required>
+                            <option value="">- Bitte wählen -</option>
+                            {% for effort in effort_levels %}
+                            <option value="{{ effort.id }}">{{ effort.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="protein">Protein (g) *</label>
+                        <input type="number" id="protein" name="protein" step="0.1" required placeholder="z.B. 25.5">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="toTakeAway" name="to_take_away">
+                            <span>Zum Mitnehmen geeignet</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Saison (Mehrfachauswahl) *</label>
+                    <div class="checkbox-group">
+                        {% for season in seasons %}
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="season_ids" value="{{ season.id }}">
+                            <span>{{ season.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal()">Abbrechen</button>
+                <button type="submit" class="btn-primary">Menü erstellen</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById('menuModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('menuModal').style.display = 'none';
+        document.getElementById('menuForm').reset();
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('menuModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    async function submitMenu(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        // Collect selected season IDs
+        const seasonIds = Array.from(form.querySelectorAll('input[name="season_ids"]:checked'))
+            .map(cb => parseInt(cb.value));
+        
+        if (seasonIds.length === 0) {
+            alert('Bitte wählen Sie mindestens eine Saison aus.');
+            return;
+        }
+        
+        const menuData = {
+            name: formData.get('name'),
+            description: formData.get('description') || null,
+            category_id: formData.get('category_id') ? parseInt(formData.get('category_id')) : null,
+            effort_level_id: formData.get('effort_level_id') ? parseInt(formData.get('effort_level_id')) : null,
+            protein: parseFloat(formData.get('protein')),
+            to_take_away: formData.get('to_take_away') === 'on',
+            season_ids: seasonIds
+        };
+        
+        try {
+            const response = await fetch('/api/menus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(menuData)
+            });
+            
+            if (response.ok) {
+                alert('Menü erfolgreich erstellt!');
+                closeModal();
+                location.reload();
+            } else {
+                const error = await response.json();
+                alert('Fehler beim Erstellen des Menüs: ' + (error.detail || 'Unbekannter Fehler'));
+            }
+        } catch (error) {
+            alert('Fehler beim Erstellen des Menüs: ' + error.message);
+        }
+    }
+</script>
+{% endblock %}
