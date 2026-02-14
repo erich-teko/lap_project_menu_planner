@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Wochenplanung - Wochenmenüplaner{% endblock %}
+{% block content %}
+<div class="week-planner-section">
+    <div class="page-header">
+        <h1>Wochenplanung</h1>
+        <p class="page-description">Planen Sie Ihre Mahlzeiten für die ganze Woche</p>
+    </div>
+
+    <form id="weekPlannerForm" class="week-planner-form" onsubmit="submitWeekPlanner(event)">
+        <div class="form-card">
+            <h2 class="form-section-title">Wochenangaben</h2>
+            
+            <div class="form-row-three">
+                <div class="form-group">
+                    <label for="year">Jahr *</label>
+                    <input type="number" id="year" name="year" required min="{{ default_year }}" max="2100" value="{{ default_year }}" placeholder="z.B. 2026">
+                </div>
+
+                <div class="form-group">
+                    <label for="week_number">Kalenderwoche *</label>
+                    <input type="number" id="week_number" name="week_number" required min="1" max="53" value="{{ default_week }}" placeholder="z.B. 7">
+                </div>
+
+                <div class="form-group">
+                    <label for="protein_goal">Proteinziel pro Woche (g) *</label>
+                    <input type="number" id="protein_goal" name="protein_goal" step="1" required value="{{ default_protein_goal }}" placeholder="z.B. 175.0">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h2 class="form-section-title">Tagesplanung</h2>
+            
+            <div class="days-grid">
+                {% set days = [
+                    {'number': 1, 'name': 'Montag', 'icon': '📅'},
+                    {'number': 2, 'name': 'Dienstag', 'icon': '📅'},
+                    {'number': 3, 'name': 'Mittwoch', 'icon': '📅'},
+                    {'number': 4, 'name': 'Donnerstag', 'icon': '📅'},
+                    {'number': 5, 'name': 'Freitag', 'icon': '📅'},
+                    {'number': 6, 'name': 'Samstag', 'icon': '🎉'},
+                    {'number': 7, 'name': 'Sonntag', 'icon': '☀️'}
+                ] %}
+
+                {% for day in days %}
+                <div class="day-card">
+                    <div class="day-header">
+                        <span class="day-icon">{{ day.icon }}</span>
+                        <h3 class="day-name">{{ day.name }}</h3>
+                    </div>
+                    
+                    <div class="day-form">
+                        <div class="form-group">
+                            <label for="effort_level_{{ day.number }}">Aufwand *</label>
+                            <select id="effort_level_{{ day.number }}" name="effort_level_{{ day.number }}" required>
+                                <option value="">- Bitte wählen -</option>
+                                <option value="1">Schnell</option>
+                                <option value="2">Mittel</option>
+                                <option value="3">Aufwändig</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label-day">
+                                <input type="checkbox" id="to_take_away_{{ day.number }}" name="to_take_away_{{ day.number }}">
+                                <span>Zum Mitnehmen</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="resetForm()">Zurücksetzen</button>
+            <button type="submit" class="btn-primary">Wochenplan erstellen</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function resetForm() {
+        if (confirm('Möchten Sie wirklich alle Eingaben zurücksetzen?')) {
+            document.getElementById('weekPlannerForm').reset();
+        }
+    }
+
+    async function submitWeekPlanner(event) {
+        event.preventDefault();
+        
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        // Build daily_menus array
+        const dailyMenus = [];
+        for (let i = 1; i <= 7; i++) {
+            const effortLevel = formData.get(`effort_level_${i}`);
+            const toTakeAway = formData.get(`to_take_away_${i}`) === 'on';
+            
+            dailyMenus.push({
+                week_day_number: i,
+                effort_level: effortLevel ? parseInt(effortLevel) : null,
+                to_take_away: toTakeAway,
+                menu_id: null
+            });
+        }
+        
+        const weekPlannerData = {
+            year: parseInt(formData.get('year')),
+            week_number: parseInt(formData.get('week_number')),
+            protein_goal: parseFloat(formData.get('protein_goal')),
+            daily_menus: dailyMenus
+        };
+        
+        console.log('Submitting week planner:', weekPlannerData);
+        
+        try {
+            const response = await fetch('/api/week-planner', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(weekPlannerData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Wochenplan erfolgreich erstellt für KW ${result.week_number}/${result.year}!`);
+                // Optionally redirect or reset form
+                // location.reload();
+            } else {
+                const error = await response.json();
+                alert('Fehler beim Erstellen des Wochenplans: ' + (error.detail || 'Unbekannter Fehler'));
+            }
+        } catch (error) {
+            alert('Fehler beim Erstellen des Wochenplans: ' + error.message);
+        }
+    }
+</script>
+{% endblock %}

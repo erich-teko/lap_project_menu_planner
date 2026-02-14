@@ -1,6 +1,6 @@
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from models.menu_planner import *
+from models.db_models import *
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -29,6 +29,12 @@ def get_all_seasons() -> list[Season]:
     with Session(engine) as session:
         seasons = session.exec(select(Season).order_by(Season.season_number)).all()
         return seasons
+
+
+def get_all_week_days() -> list[WeekDay]:
+    with Session(engine) as session:
+        week_days = session.exec(select(WeekDay).order_by(WeekDay.week_day_number)).all()
+        return week_days
 
 
 def get_menues(limit: int = 20) -> list[Menu]:

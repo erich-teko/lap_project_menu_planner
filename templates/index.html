@@ -9,14 +9,16 @@ endblock %} {% block content %}
     </div>
 
     <div class="features-grid">
-        <div class="feature-card">
-            <div class="feature-icon">📅</div>
-            <h3>Wochenplanung</h3>
-            <p>
-                Planen Sie Ihre Mahlzeiten für die ganze Woche im Voraus und sparen Sie
-                Zeit.
-            </p>
-        </div>
+        <a href="{{ url_for('week_planner') }}" class="feature-card-link">
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3>Wochenplanung</h3>
+                <p>
+                    Planen Sie Ihre Mahlzeiten für die ganze Woche im Voraus und sparen Sie
+                    Zeit.
+                </p>
+            </div>
+        </a>
 
         <a href="{{ url_for('menu_collection') }}" class="feature-card-link">
             <div class="feature-card">
@@ -33,7 +35,9 @@ endblock %} {% block content %}
     <div class="cta-section">
         <h2>Beginnen Sie noch heute mit der Planung!</h2>
         <p>Organisieren Sie Ihre Woche und geniessen Sie stressfreie Mahlzeiten.</p>
-        <button class="cta-button">Los geht's</button>
+        <a href="{{ url_for('week_planner') }}">
+            <button class="cta-button">Los geht's</button>
+        </a>
     </div>
 </div>
 {% endblock %}

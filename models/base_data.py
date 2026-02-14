@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from db_engin import engine
-from models.menu_planner import EffortLevel, MenuCategory, Season
+from models.db_models import EffortLevel, MenuCategory, Season, WeekDay
 
 
 def create_effort_levels():
@@ -9,12 +9,12 @@ def create_effort_levels():
         if session.exec(select(EffortLevel)).first():
             return  # Effort levels already exist, no need to create them again
         effort_levels = [
-            ("schnell", "Aufwand bis zu 30 Minuten"),
-            ("mittel", "Aufwand über 30 bis zu 60 Minuten"),
-            ("aufwendig", "Aufwand über 60 Minuten"),
+            ("schnell", "Aufwand bis zu 30 Minuten", 1),
+            ("mittel", "Aufwand über 30 bis zu 60 Minuten", 2),
+            ("aufwendig", "Aufwand über 60 Minuten", 3),
         ]
-        for name, description in effort_levels:
-            effort_level = EffortLevel(name=name, description=description)
+        for name, description, effort_level_number in effort_levels:
+            effort_level = EffortLevel(name=name, description=description, effort_level_number=effort_level_number)
             session.add(effort_level)
         session.commit()
 
@@ -56,7 +56,27 @@ def create_seasons():
         session.commit()
 
 
+def create_week_days():
+    with Session(engine) as session:
+        if session.exec(select(WeekDay)).first():
+            return  # Week days already exist, no need to create them again
+        week_days = [
+            ("Montag", 1),
+            ("Dienstag", 2),
+            ("Mittwoch", 3),
+            ("Donnerstag", 4),
+            ("Freitag", 5),
+            ("Samstag", 6),
+            ("Sonntag", 7),
+        ]
+        for name, week_day_number in week_days:
+            week_day = WeekDay(name=name, week_day_number=week_day_number)
+            session.add(week_day)
+        session.commit()
+
+
 def initialize_database():
     create_effort_levels()
     create_recipe_categories()
     create_seasons()
+    create_week_days()
