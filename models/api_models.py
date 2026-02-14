@@ -1,6 +1,7 @@
-from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
+
+from pydantic import BaseModel
 
 
 class EffortLevel(IntEnum):
@@ -9,16 +10,14 @@ class EffortLevel(IntEnum):
     COMPLICATED = 3
 
 
-@dataclass
-class DayMenu:
+class DayMenu(BaseModel):
     week_day_number: int  # 1=Monday, 7=Sunday
     effort_level: EffortLevel | None = None
     to_take_away: bool = False
     menu_id: int | None = None
 
 
-@dataclass
-class WeekPlanner:
+class WeekPlanner(BaseModel):
     year: int
     week_number: int
     protein_goal: float
@@ -34,3 +33,13 @@ def create_default_week_planner() -> WeekPlanner:
         protein_goal=25.0 * 7,  # Default to 25g protein per day for a week
         daily_menus=[DayMenu(week_day_number=i) for i in range(1, 8)],
     )
+
+
+class MenuCreate(BaseModel):
+    name: str
+    description: str | None = None
+    category_id: int | None = None
+    effort_level_id: int | None = None
+    to_take_away: bool = False
+    protein: float
+    season_ids: list[int]

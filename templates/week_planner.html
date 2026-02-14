@@ -14,7 +14,7 @@
             <div class="form-row-three">
                 <div class="form-group">
                     <label for="year">Jahr *</label>
-                    <input type="number" id="year" name="year" required min="2020" max="2100" value="{{ default_year }}" placeholder="z.B. 2026">
+                    <input type="number" id="year" name="year" required min="{{ default_year }}" max="2100" value="{{ default_year }}" placeholder="z.B. 2026">
                 </div>
 
                 <div class="form-group">
@@ -24,7 +24,7 @@
 
                 <div class="form-group">
                     <label for="protein_goal">Proteinziel pro Woche (g) *</label>
-                    <input type="number" id="protein_goal" name="protein_goal" step="0.1" required value="175.0" placeholder="z.B. 175.0">
+                    <input type="number" id="protein_goal" name="protein_goal" step="1" required value="{{ default_protein_goal }}" placeholder="z.B. 175.0">
                 </div>
             </div>
         </div>

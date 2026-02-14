@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from db_engin import engine
-from models.menu_planner import EffortLevel, MenuCategory, Season, WeekDay
+from models.db_models import EffortLevel, MenuCategory, Season, WeekDay
 
 
 def create_effort_levels():

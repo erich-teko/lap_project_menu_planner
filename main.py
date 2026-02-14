@@ -1,11 +1,8 @@
-from datetime import datetime
-
 from fastapi import FastAPI, Request
 from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 
 from db_engin import (
     create_db_and_tables,
@@ -15,33 +12,9 @@ from db_engin import (
     get_all_seasons,
     get_menus_with_details,
 )
+from models.api_models import DayMenu, EffortLevel, MenuCreate, WeekPlanner, create_default_week_planner
 from models.base_data import initialize_database
-from models.menu_planner import Menu
-from planner.planner_models import DayMenu, EffortLevel, WeekPlanner
-
-
-class MenuCreate(BaseModel):
-    name: str
-    description: str | None = None
-    category_id: int | None = None
-    effort_level_id: int | None = None
-    to_take_away: bool = False
-    protein: float
-    season_ids: list[int]
-
-
-class DayMenuCreate(BaseModel):
-    week_day_number: int
-    effort_level: int | None = None
-    to_take_away: bool = False
-    menu_id: int | None = None
-
-
-class WeekPlannerCreate(BaseModel):
-    year: int
-    week_number: int
-    protein_goal: float
-    daily_menus: list[DayMenuCreate]
+from models.db_models import Menu
 
 
 @asynccontextmanager
@@ -70,7 +43,7 @@ async def menu_collection(request: Request):
     categories = get_all_menu_categories()
     effort_levels = get_all_effort_levels()
     seasons = get_all_seasons()
-    
+
     return templates.TemplateResponse(
         "menu_collection.html",
         {
@@ -93,35 +66,35 @@ async def create_menu_api(menu_data: MenuCreate):
         to_take_away=menu_data.to_take_away,
         protein=menu_data.protein,
     )
-    
+
     created_menu = create_menu(menu, menu_data.season_ids)
     return {"id": created_menu.id, "name": created_menu.name}
 
 
 @menu_planner.get("/week-planner", response_class=HTMLResponse, name="week_planner")
 async def week_planner_page(request: Request):
-    now = datetime.now()
-    current_year, current_week, _ = now.isocalendar()
-    
+    week_planner_default = create_default_week_planner()
+
     return templates.TemplateResponse(
         "week_planner.html",
         {
             "request": request,
-            "default_year": current_year,
-            "default_week": current_week + 1,  # Next week
+            "default_year": week_planner_default.year,
+            "default_week": week_planner_default.week_number,
+            "default_protein_goal": week_planner_default.protein_goal,
         },
     )
 
 
 @menu_planner.post("/api/week-planner")
-async def create_week_planner_api(planner_data: WeekPlannerCreate):
+async def create_week_planner_api(planner_settings: WeekPlanner):
     # Convert Pydantic models to dataclass instances
     daily_menus = []
-    for day in planner_data.daily_menus:
+    for day in planner_settings.daily_menus:
         effort_level_enum: EffortLevel | None = None
         if day.effort_level is not None:
             effort_level_enum = EffortLevel(day.effort_level)
-        
+
         daily_menus.append(
             DayMenu(
                 week_day_number=day.week_day_number,
@@ -130,14 +103,14 @@ async def create_week_planner_api(planner_data: WeekPlannerCreate):
                 menu_id=day.menu_id,
             )
         )
-    
+
     week_planner = WeekPlanner(
-        year=planner_data.year,
-        week_number=planner_data.week_number,
-        protein_goal=planner_data.protein_goal,
+        year=planner_settings.year,
+        week_number=planner_settings.week_number,
+        protein_goal=planner_settings.protein_goal,
         daily_menus=daily_menus,
     )
-    
+
     # Here you would typically save the week planner to a database
     # For now, just return the created planner data
     return {
@@ -146,5 +119,3 @@ async def create_week_planner_api(planner_data: WeekPlannerCreate):
         "protein_goal": week_planner.protein_goal,
         "daily_menus_count": len(week_planner.daily_menus),
     }
-
-
