@@ -1,36 +1,35 @@
-from typing import Optional
-
 from sqlmodel import Field, SQLModel
 
 
 class EffortLevel(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     effort_level_number: int = Field(unique=True)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class MenuCategory(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class Season(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     season_number: int = Field(unique=True)
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class Menu(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
-    description: Optional[str] = None
+    description: str | None = None
     category_id: int = Field(foreign_key="menucategory.id")
     effort_level_id: int = Field(foreign_key="effortlevel.id")
-    to_take_away: bool = False
     protein: float
+    to_take_away: bool = False
+    imported: bool = False
 
 
 class MenuSeasonLink(SQLModel, table=True):
@@ -39,6 +38,7 @@ class MenuSeasonLink(SQLModel, table=True):
 
 
 class WeekDay(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     week_day_number: int = Field(unique=True)
+    icon: str | None = None
