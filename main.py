@@ -10,6 +10,7 @@ from db_engin import (
     get_all_effort_levels,
     get_all_menu_categories,
     get_all_seasons,
+    get_all_week_days,
     get_menus_with_details,
 )
 from models.api_models import DayMenu, EffortLevel, MenuCreate, WeekPlanner, create_default_week_planner
@@ -74,6 +75,8 @@ async def create_menu_api(menu_data: MenuCreate):
 @menu_planner.get("/week-planner", response_class=HTMLResponse, name="week_planner")
 async def week_planner_page(request: Request):
     week_planner_default = create_default_week_planner()
+    effort_levels = get_all_effort_levels()
+    week_days = get_all_week_days()
 
     return templates.TemplateResponse(
         "week_planner.html",
@@ -82,6 +85,8 @@ async def week_planner_page(request: Request):
             "default_year": week_planner_default.year,
             "default_week": week_planner_default.week_number,
             "default_protein_goal": week_planner_default.protein_goal,
+            "effort_levels": effort_levels,
+            "week_days": week_days,
         },
     )
 

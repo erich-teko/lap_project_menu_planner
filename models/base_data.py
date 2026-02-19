@@ -24,14 +24,20 @@ def create_recipe_categories():
         if session.exec(select(MenuCategory)).first():
             return  # Recipe categories already exist, no need to create them again
         categories = [
-            "Pastagericht",
-            "Reisgericht",
+            "Pasta",
+            "Reis",
             "Salat",
             "Suppen",
             "Eintopf",
-            "Fleischgericht",
-            "Vegetarisch",
-            "Vegan",
+            "Fleisch",
+            "Eier",
+            "Tofu",
+            "Fisch",
+            "Kartoffeln",
+            "Käse",
+            "Gratin",
+            "Pizza/Flammkuchen",
+            "Wähen/Quiche",
         ]
         for name in categories:
             category = MenuCategory(name=name)
@@ -61,16 +67,16 @@ def create_week_days():
         if session.exec(select(WeekDay)).first():
             return  # Week days already exist, no need to create them again
         week_days = [
-            ("Montag", 1),
-            ("Dienstag", 2),
-            ("Mittwoch", 3),
-            ("Donnerstag", 4),
-            ("Freitag", 5),
-            ("Samstag", 6),
-            ("Sonntag", 7),
+            ("Montag", 1, "👷"),
+            ("Dienstag", 2, "👷"),
+            ("Mittwoch", 3, "👷"),
+            ("Donnerstag", 4, "👷"),
+            ("Freitag", 5, "👷"),
+            ("Samstag", 6, "🎉"),
+            ("Sonntag", 7, "🌞"),
         ]
-        for name, week_day_number in week_days:
-            week_day = WeekDay(name=name, week_day_number=week_day_number)
+        for name, week_day_number, icon in week_days:
+            week_day = WeekDay(name=name, week_day_number=week_day_number, icon=icon)
             session.add(week_day)
         session.commit()
 

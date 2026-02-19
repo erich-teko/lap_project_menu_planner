@@ -33,17 +33,9 @@
             <h2 class="form-section-title">Tagesplanung</h2>
             
             <div class="days-grid">
-                {% set days = [
-                    {'number': 1, 'name': 'Montag', 'icon': '📅'},
-                    {'number': 2, 'name': 'Dienstag', 'icon': '📅'},
-                    {'number': 3, 'name': 'Mittwoch', 'icon': '📅'},
-                    {'number': 4, 'name': 'Donnerstag', 'icon': '📅'},
-                    {'number': 5, 'name': 'Freitag', 'icon': '📅'},
-                    {'number': 6, 'name': 'Samstag', 'icon': '🎉'},
-                    {'number': 7, 'name': 'Sonntag', 'icon': '☀️'}
-                ] %}
+                
 
-                {% for day in days %}
+                {% for day in week_days %}
                 <div class="day-card">
                     <div class="day-header">
                         <span class="day-icon">{{ day.icon }}</span>
@@ -55,9 +47,9 @@
                             <label for="effort_level_{{ day.number }}">Aufwand *</label>
                             <select id="effort_level_{{ day.number }}" name="effort_level_{{ day.number }}" required>
                                 <option value="">- Bitte wählen -</option>
-                                <option value="1">Schnell</option>
-                                <option value="2">Mittel</option>
-                                <option value="3">Aufwändig</option>
+                                {% for effort in effort_levels %}
+                                <option value="{{ effort.id }}">{{ effort.name }} ({{ effort.description }})</option>
+                                {% endfor %}
                             </select>
                         </div>
 
