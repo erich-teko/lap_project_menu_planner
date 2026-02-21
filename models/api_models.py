@@ -10,36 +10,47 @@ class EffortLevel(IntEnum):
     COMPLICATED = 3
 
 
-class DayMenu(BaseModel):
+class DaySettings(BaseModel):
     week_day_number: int  # 1=Monday, 7=Sunday
     effort_level: EffortLevel | None = None
     to_take_away: bool = False
-    menu_id: int | None = None
 
 
-class WeekPlanner(BaseModel):
+class WeekPlannerSettings(BaseModel):
     year: int
     week_number: int
     protein_goal: float
-    daily_menus: list[DayMenu]  # List of 7 DayMenu objects, one for each day of the week
+    daily_menus: list[DaySettings]  # List of 7 DaySettings objects, one for each day of the week
 
 
-def create_default_week_planner() -> WeekPlanner:
+def create_default_week_planner() -> WeekPlannerSettings:
     now = datetime.now()
     current_year, current_week, _ = now.isocalendar()
-    return WeekPlanner(
+    return WeekPlannerSettings(
         year=current_year,
         week_number=current_week + 1,
         protein_goal=25.0 * 7,  # Default to 25g protein per day for a week
-        daily_menus=[DayMenu(week_day_number=i) for i in range(1, 8)],
+        daily_menus=[DaySettings(week_day_number=i) for i in range(1, 8)],
     )
 
 
-class MenuCreate(BaseModel):
+class MenuInfo(BaseModel):
     name: str
-    description: str | None = None
-    category_id: int | None = None
-    effort_level_id: int | None = None
-    to_take_away: bool = False
+    category_id: int
+    effort_level_id: int
     protein: float
     season_ids: list[int]
+    to_take_away: bool = False
+    description: str | None = None
+    id: int | None = None  # Optional ID field for existing menus
+
+
+class DayMenuInfo(BaseModel):
+    week_day_number: int  # 1=Monday, 7=Sunday
+    menu: MenuInfo
+
+
+class WeekPlannerResult(BaseModel):
+    year: int
+    week_number: int
+    daily_menus: list[DayMenuInfo]  # List of 7 DayMenuInfo objects

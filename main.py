@@ -13,7 +13,7 @@ from db_engin import (
     get_all_week_days,
     get_menus_with_details,
 )
-from models.api_models import DayMenu, EffortLevel, MenuCreate, WeekPlanner, create_default_week_planner
+from models.api_models import DaySettings, EffortLevel, MenuInfo, WeekPlannerSettings, create_default_week_planner
 from models.base_data import initialize_database
 from models.db_models import Menu
 
@@ -58,7 +58,7 @@ async def menu_collection(request: Request):
 
 
 @menu_planner.post("/api/menus")
-async def create_menu_api(menu_data: MenuCreate):
+async def create_menu_api(menu_data: MenuInfo):
     menu = Menu(
         name=menu_data.name,
         description=menu_data.description,
@@ -92,7 +92,7 @@ async def week_planner_page(request: Request):
 
 
 @menu_planner.post("/api/week-planner")
-async def create_week_planner_api(planner_settings: WeekPlanner):
+async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     # Convert Pydantic models to dataclass instances
     daily_menus = []
     for day in planner_settings.daily_menus:
@@ -101,7 +101,7 @@ async def create_week_planner_api(planner_settings: WeekPlanner):
             effort_level_enum = EffortLevel(day.effort_level)
 
         daily_menus.append(
-            DayMenu(
+            DaySettings(
                 week_day_number=day.week_day_number,
                 effort_level=effort_level_enum,
                 to_take_away=day.to_take_away,
@@ -109,7 +109,7 @@ async def create_week_planner_api(planner_settings: WeekPlanner):
             )
         )
 
-    week_planner = WeekPlanner(
+    week_planner = WeekPlannerSettings(
         year=planner_settings.year,
         week_number=planner_settings.week_number,
         protein_goal=planner_settings.protein_goal,
