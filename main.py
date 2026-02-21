@@ -14,8 +14,16 @@ from db_engin import (
     get_menu_collection,
     get_menus_with_details,
     import_example_menu_collection,
+    save_week_planner_result,
 )
-from models.api_models import DaySettings, EffortLevel, MenuInfo, WeekPlannerSettings, create_default_week_planner
+from models.api_models import (
+    DaySettings,
+    EffortLevel,
+    MenuInfo,
+    WeekPlannerResult,
+    WeekPlannerSettings,
+    create_default_week_planner,
+)
 from models.base_data import initialize_database
 from models.db_models import Menu
 from planner.week_planner import WeekMenuPlanner
@@ -80,7 +88,7 @@ async def week_planner_page(request: Request):
     week_planner_default = create_default_week_planner()
     effort_levels = get_all_effort_levels()
     week_days = get_all_week_days()
-    
+
     # Convert SQLModel objects to dictionaries for JSON serialization
     week_days_dict = [day.model_dump() for day in week_days]
 
@@ -97,7 +105,7 @@ async def week_planner_page(request: Request):
     )
 
 
-@menu_planner.post("/api/week-planner")
+@menu_planner.post("/api/week-planner/start-planning")
 async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     # Convert Pydantic models to dataclass instances
     daily_menus = []
@@ -129,3 +137,9 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
 async def import_menus():
     imported_count = import_example_menu_collection("example/menu_collection.json")
     return {"imported_menus": imported_count}
+
+
+@menu_planner.post("/api/week-planner", status_code=status.HTTP_201_CREATED)
+async def save_planned_week(week_planner_result: WeekPlannerResult):
+    save_week_planner_result(week_planner_result)
+    return {"message": "Week planner result saved successfully"}

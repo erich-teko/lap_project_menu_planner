@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, UniqueConstraint
 
 
 class EffortLevel(SQLModel, table=True):
@@ -42,3 +42,19 @@ class WeekDay(SQLModel, table=True):
     name: str = Field(unique=True)
     week_day_number: int = Field(unique=True)
     icon: str | None = None
+
+class WeekPlanningResult(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    year: int = Field(index=True)
+    week_number: int = Field(index=True)
+    __table_args__ = (
+        UniqueConstraint("year", "week_number", name="unique_year_week"),
+    )
+
+class DayMenuResult(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    week_planning_result_id: int = Field(foreign_key="weekplanningresult.id")
+    week_day_id: int = Field(foreign_key="weekday.id")
+    menu_id: int = Field(foreign_key="menu.id")
+    effort_level_id: int = Field(foreign_key="effortlevel.id")
+    to_take_away: bool = False

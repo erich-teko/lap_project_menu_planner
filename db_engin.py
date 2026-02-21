@@ -3,7 +3,8 @@ import json
 from pydantic import TypeAdapter
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from models.api_models import MenuInfo
+from exceptions import WeekPlannerSaveException
+from models.api_models import MenuInfo, WeekPlannerResult
 from models.db_models import *
 
 sqlite_file_name = "database.db"
@@ -167,3 +168,35 @@ def import_example_menu_collection(json_file_path: str) -> int:
             session.commit()
 
     return len(menu_record_collection)
+
+
+def save_week_planner_result(week_planner_result: WeekPlannerResult):
+    with Session(engine) as session:
+        if session.exec(
+            select(WeekPlanningResult).where(
+                (WeekPlanningResult.year == week_planner_result.year)
+                & (WeekPlanningResult.week_number == week_planner_result.week_number)
+            )
+        ).first():
+            raise WeekPlannerSaveException(
+                "A week planner result for the specified year and week number already exists."
+            )
+        week_days = session.exec(select(WeekDay)).all()
+        week_day_number_to_id = {week_day.week_day_number: week_day.id for week_day in week_days}
+        week_planning_result_record = WeekPlanningResult(
+            year=week_planner_result.year, week_number=week_planner_result.week_number
+        )
+        session.add(week_planning_result_record)
+        session.commit()
+
+        if week_planning_result_record.id:
+            for daily_menu_result in week_planner_result.daily_menus:
+                daily_menu_result_record = DayMenuResult(
+                    week_planning_result_id=week_planning_result_record.id,
+                    week_day_id=week_day_number_to_id[daily_menu_result.week_day_number],
+                    menu_id=daily_menu_result.menu.id,
+                    effort_level_id=daily_menu_result.effort_level_id,
+                    to_take_away=daily_menu_result.to_take_away,
+                )
+                session.add(daily_menu_result_record)
+            session.commit()

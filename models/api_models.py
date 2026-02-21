@@ -48,6 +48,8 @@ class MenuInfo(BaseModel):
 class DayMenuInfo(BaseModel):
     week_day_number: int  # 1=Monday, 7=Sunday
     menu: MenuInfo
+    effort_level_id: int
+    to_take_away: bool = False
 
 
 class WeekPlannerResult(BaseModel):

@@ -67,7 +67,12 @@ class WeekMenuPlanner:
 
         menu_chosen = choice(menu_to_choose_from)
         self._planning_result.daily_menus.append(
-            DayMenuInfo(week_day_number=day_settings.week_day_number, menu=menu_chosen)
+            DayMenuInfo(
+                week_day_number=day_settings.week_day_number,
+                menu=menu_chosen,
+                effort_level_id=day_settings.effort_level,
+                to_take_away=day_settings.to_take_away,
+            )
         )
 
         if self._days_of_the_week_to_plan:
