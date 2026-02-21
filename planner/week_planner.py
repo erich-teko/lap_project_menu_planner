@@ -2,6 +2,7 @@ from copy import deepcopy
 from datetime import date
 from random import choice
 
+from exceptions import WeekPlannerInitException
 from models.api_models import DayMenuInfo, DaySettings, MenuInfo, WeekPlannerResult, WeekPlannerSettings
 
 
@@ -18,11 +19,18 @@ class WeekMenuPlanner:
     used_menu_ids : set[int]
         A set of menu IDs that have already been used in previous weeks,
         to avoid repeating the same menus too frequently
+
+    Raises
+    ------
+    WeekPlannerInitException
+        If there are no menus available to initialize the WeekMenuPlanner
     """
 
     def __init__(
         self, menus: list[MenuInfo], week_planner_settings: WeekPlannerSettings, used_menu_ids: set[int]
     ) -> None:
+        if not menus:
+            raise WeekPlannerInitException("No menus available to initialize the WeekMenuPlanner.")
         self._menus = menus
         self._week_planner_settings = week_planner_settings
         self._season_number = self._calculate_season_number(

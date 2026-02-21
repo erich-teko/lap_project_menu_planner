@@ -1,5 +1,8 @@
 import pytest
+from unit_test_base_functions import load_week_planner_settings_from_json
 
+from exceptions import WeekPlannerInitException
+from models.api_models import WeekPlannerSettings
 from planner.week_planner import WeekMenuPlanner
 
 
@@ -35,3 +38,11 @@ def test_season_calculation():
     # Test case for a date in December (should be Winter)
     year, week_number = 2026, 53  # This corresponds to a date in December
     assert WeekMenuPlanner._calculate_season_number(year, week_number) == 4
+
+
+def test_week_planner_with_no_menus():
+    menus = []  # No menus available
+    week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
+    used_menu_ids = set()
+    with pytest.raises(WeekPlannerInitException, match="No menus available to initialize the WeekMenuPlanner."):
+        WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
