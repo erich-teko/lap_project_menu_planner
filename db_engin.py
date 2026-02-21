@@ -20,25 +20,25 @@ def create_db_and_tables():
 def get_all_effort_levels() -> list[EffortLevel]:
     with Session(engine) as session:
         effort_levels = session.exec(select(EffortLevel).order_by(EffortLevel.id)).all()
-        return effort_levels
+        return list(effort_levels)
 
 
 def get_all_menu_categories() -> list[MenuCategory]:
     with Session(engine) as session:
         menu_categories = session.exec(select(MenuCategory).order_by(MenuCategory.name)).all()
-        return menu_categories
+        return list(menu_categories)
 
 
 def get_all_seasons() -> list[Season]:
     with Session(engine) as session:
         seasons = session.exec(select(Season).order_by(Season.season_number)).all()
-        return seasons
+        return list(seasons)
 
 
 def get_all_week_days() -> list[WeekDay]:
     with Session(engine) as session:
         week_days = session.exec(select(WeekDay).order_by(WeekDay.week_day_number)).all()
-        return week_days
+        return list(week_days)
 
 
 def get_menu_collection() -> list[MenuInfo]:
