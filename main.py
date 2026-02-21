@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -13,6 +13,7 @@ from db_engin import (
     get_all_week_days,
     get_menu_collection,
     get_menus_with_details,
+    import_example_menu_collection,
 )
 from models.api_models import DaySettings, EffortLevel, MenuInfo, WeekPlannerSettings, create_default_week_planner
 from models.base_data import initialize_database
@@ -119,3 +120,9 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     used_menu_ids = set()  # You can modify this to include any pre-used menu
     week_menu_planner = WeekMenuPlanner(menus, week_planner, used_menu_ids)
     return week_menu_planner.plan_week_menus()
+
+
+@menu_planner.post("/api/menus/import", status_code=status.HTTP_201_CREATED)
+async def import_menus():
+    imported_count = import_example_menu_collection("example/menu_collection.json")
+    return {"imported_menus": imported_count}

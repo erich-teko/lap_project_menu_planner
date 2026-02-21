@@ -1,3 +1,6 @@
+import json
+
+from pydantic import TypeAdapter
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from models.api_models import MenuInfo
@@ -121,3 +124,46 @@ def get_menus_with_details() -> list[dict]:
             )
 
         return result
+
+
+def import_example_menu_collection(json_file_path: str) -> int:
+    try:
+        with open(json_file_path, "r") as file:
+            menu_collection_py = json.load(file)
+    except FileNotFoundError:
+        raise ValueError(f"JSON file not found at {json_file_path}")
+    except json.JSONDecodeError:
+        raise ValueError(f"Invalid JSON format in file at {json_file_path}")
+
+    if not menu_collection_py:
+        raise ValueError(f"No menus found in the JSON file at {json_file_path}")
+
+    type_adapter = TypeAdapter(list[MenuInfo])
+    menu_collection = type_adapter.validate_python(menu_collection_py)
+    with Session(engine) as session:
+        existing_menus = session.exec(select(Menu)).all()
+        menu_record_collection = []
+        for menu in menu_collection:
+            if any(existing_menu.name == menu.name for existing_menu in existing_menus):
+                continue  # Skip if menu with the same name already exists
+            menu_record = Menu(
+                name=menu.name,
+                description=menu.description,
+                category_id=menu.category_id,
+                effort_level_id=menu.effort_level_id,
+                protein=menu.protein,
+                to_take_away=menu.to_take_away,
+                imported=True,
+            )
+            session.add(menu_record)
+            menu_record_collection.append((menu_record, menu.season_ids))
+        session.commit()
+
+        for menu_record, season_ids in menu_record_collection:
+            if menu_record.id:
+                for season_id in season_ids:
+                    menu_season_link = MenuSeasonLink(menu_id=menu_record.id, season_id=season_id)
+                    session.add(menu_season_link)
+            session.commit()
+
+    return len(menu_record_collection)
