@@ -11,11 +11,13 @@ from db_engin import (
     get_all_menu_categories,
     get_all_seasons,
     get_all_week_days,
+    get_menu_collection,
     get_menus_with_details,
 )
 from models.api_models import DaySettings, EffortLevel, MenuInfo, WeekPlannerSettings, create_default_week_planner
 from models.base_data import initialize_database
 from models.db_models import Menu
+from planner.week_planner import WeekMenuPlanner
 
 
 @asynccontextmanager
@@ -102,10 +104,7 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
 
         daily_menus.append(
             DaySettings(
-                week_day_number=day.week_day_number,
-                effort_level=effort_level_enum,
-                to_take_away=day.to_take_away,
-                menu_id=day.menu_id,
+                week_day_number=day.week_day_number, effort_level=effort_level_enum, to_take_away=day.to_take_away
             )
         )
 
@@ -116,11 +115,7 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
         daily_menus=daily_menus,
     )
 
-    # Here you would typically save the week planner to a database
-    # For now, just return the created planner data
-    return {
-        "year": week_planner.year,
-        "week_number": week_planner.week_number,
-        "protein_goal": week_planner.protein_goal,
-        "daily_menus_count": len(week_planner.daily_menus),
-    }
+    menus = get_menu_collection()
+    used_menu_ids = set()  # You can modify this to include any pre-used menu
+    week_menu_planner = WeekMenuPlanner(menus, week_planner, used_menu_ids)
+    return week_menu_planner.plan_week_menus()

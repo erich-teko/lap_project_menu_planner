@@ -1,5 +1,6 @@
 from sqlmodel import Session, SQLModel, create_engine, select
 
+from models.api_models import MenuInfo
 from models.db_models import *
 
 sqlite_file_name = "database.db"
@@ -35,6 +36,26 @@ def get_all_week_days() -> list[WeekDay]:
     with Session(engine) as session:
         week_days = session.exec(select(WeekDay).order_by(WeekDay.week_day_number)).all()
         return week_days
+
+
+def get_menu_collection() -> list[MenuInfo]:
+    with Session(engine) as session:
+        menus = session.exec(select(Menu)).all()
+        menu_seasons = session.exec(select(MenuSeasonLink)).all()
+        menu_collection = []
+        for menu in menus:
+            season_ids = [season.season_id for season in menu_seasons if season.menu_id == menu.id]
+            menu_info = MenuInfo(
+                id=menu.id,
+                name=menu.name,
+                category_id=menu.category_id,
+                effort_level_id=menu.effort_level_id,
+                to_take_away=menu.to_take_away,
+                protein=menu.protein,
+                season_ids=season_ids,
+            )
+            menu_collection.append(menu_info)
+        return menu_collection
 
 
 def get_menues(limit: int = 20) -> list[Menu]:
