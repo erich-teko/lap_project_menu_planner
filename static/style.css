@@ -600,6 +600,89 @@ body {
     gap: 1.5rem;
 }
 
+/* Days Table */
+.days-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.days-table thead {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #34495e 100%);
+    color: white;
+}
+
+.days-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.days-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.days-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.days-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.days-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.day-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.day-icon {
+    font-size: 1.5rem;
+}
+
+.day-name {
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.days-table select {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.75rem;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    background-color: white;
+    cursor: pointer;
+}
+
+.days-table select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.days-table select:hover {
+    border-color: #d0d3d4;
+}
+
+.checkbox-cell {
+    text-align: center;
+}
+
+.checkbox-cell input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 .day-card {
     background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     border: 2px solid #e9ecef;
@@ -621,17 +704,6 @@ body {
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid #e9ecef;
-}
-
-.day-icon {
-    font-size: 1.5rem;
-}
-
-.day-name {
-    color: var(--text-dark);
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
 }
 
 .day-form {
