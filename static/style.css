@@ -753,6 +753,23 @@ body {
     min-width: 180px;
 }
 
+/* Week Planner Result Styles */
+.week-planner-result {
+    margin-top: 2rem;
+    animation: fadeInUp 0.5s ease;
+}
+
+.days-table tfoot {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    font-weight: bold;
+}
+
+.days-table tfoot th {
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {

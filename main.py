@@ -80,6 +80,9 @@ async def week_planner_page(request: Request):
     week_planner_default = create_default_week_planner()
     effort_levels = get_all_effort_levels()
     week_days = get_all_week_days()
+    
+    # Convert SQLModel objects to dictionaries for JSON serialization
+    week_days_dict = [day.model_dump() for day in week_days]
 
     return templates.TemplateResponse(
         "week_planner.html",
@@ -89,7 +92,7 @@ async def week_planner_page(request: Request):
             "default_week": week_planner_default.week_number,
             "default_protein_goal": week_planner_default.protein_goal,
             "effort_levels": effort_levels,
-            "week_days": week_days,
+            "week_days": week_days_dict,
         },
     )
 
