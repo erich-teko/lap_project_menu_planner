@@ -96,12 +96,17 @@
                     </tfoot>
                 </table>
             </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn-primary" onclick="saveWeekPlanner()">Wochenplanung speichern</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     const weekDays = {{ week_days | tojson }};
+    let currentWeekPlannerResult = null;
     
     function getWeekDayName(weekDayNumber) {
         const day = weekDays.find(d => d.week_day_number === weekDayNumber);
@@ -150,7 +155,7 @@
         console.log('Submitting week planner:', weekPlannerData);
         
         try {
-            const response = await fetch('/api/week-planner', {
+            const response = await fetch('/api/week-planner/start-planning', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,6 +176,9 @@
     }
     
     function displayWeekPlannerResult(result) {
+        // Store the result for later saving
+        currentWeekPlannerResult = result;
+        
         // Update header
         document.getElementById('resultWeek').textContent = result.week_number;
         document.getElementById('resultYear').textContent = result.year;
@@ -213,6 +221,33 @@
         
         // Scroll to result
         document.getElementById('weekPlannerResult').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    async function saveWeekPlanner() {
+        if (!currentWeekPlannerResult) {
+            alert('Kein Wochenplan zum Speichern vorhanden.');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/week-planner', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currentWeekPlannerResult)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                alert('Wochenplan erfolgreich in der Datenbank gespeichert!');
+            } else {
+                const error = await response.json();
+                alert('Fehler beim Speichern: ' + (error.detail || 'Unbekannter Fehler'));
+            }
+        } catch (error) {
+            alert('Fehler beim Speichern: ' + error.message);
+        }
     }
 </script>
 {% endblock %}
