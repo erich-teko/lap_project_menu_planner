@@ -62,6 +62,18 @@ def get_menu_collection() -> list[MenuInfo]:
         return menu_collection
 
 
+def get_last_weeks_menus(number_of_weeks: int) -> set[int]:
+    with Session(engine) as session:
+        menus = session.exec(
+            select(DayMenuResult, WeekPlanningResult)
+            .join(WeekPlanningResult)
+            .order_by(WeekPlanningResult.year.desc(), WeekPlanningResult.week_number.desc())
+            .limit(number_of_weeks * 7)
+        )
+        print(type(menus))
+        return {menu.DayMenuResult.menu_id for menu in menus}
+
+
 def get_menues(limit: int = 20) -> list[Menu]:
     with Session(engine) as session:
         menues = session.exec(select(Menu).order_by(Menu.name).limit(limit)).all()

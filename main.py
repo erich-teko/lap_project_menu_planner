@@ -11,6 +11,7 @@ from db_engin import (
     get_all_menu_categories,
     get_all_seasons,
     get_all_week_days,
+    get_last_weeks_menus,
     get_menu_collection,
     get_menus_with_details,
     import_example_menu_collection,
@@ -128,7 +129,7 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     )
 
     menus = get_menu_collection()
-    used_menu_ids = set()  # You can modify this to include any pre-used menu
+    used_menu_ids = get_last_weeks_menus(4)
     week_menu_planner = WeekMenuPlanner(menus, week_planner, used_menu_ids)
     return week_menu_planner.plan_week_menus()
 
