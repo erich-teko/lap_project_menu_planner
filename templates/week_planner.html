@@ -202,7 +202,7 @@
             menuCell.textContent = dayMenu.menu.name;
             
             const proteinCell = document.createElement('td');
-            proteinCell.textContent = dayMenu.menu.protein.toFixed(1);
+            proteinCell.textContent = dayMenu.menu.protein.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
             proteinCell.style.textAlign = 'right';
             
             row.appendChild(dayCell);
@@ -214,7 +214,7 @@
         });
         
         // Update total protein
-        document.getElementById('totalProtein').textContent = totalProtein.toFixed(1);
+        document.getElementById('totalProtein').textContent = totalProtein.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
         
         // Show result section
         document.getElementById('weekPlannerResult').style.display = 'block';
