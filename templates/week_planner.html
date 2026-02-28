@@ -130,16 +130,16 @@
         const dailyMenus = [];
         for (let i = 1; i <= 7; i++) {
             const effortLevelValue = formData.get(`effort_level_${i}`);
-            const effortLevel = effortLevelValue && effortLevelValue !== '' ? parseInt(effortLevelValue) : null;
+            const effortLevelId = effortLevelValue && effortLevelValue !== '' ? parseInt(effortLevelValue) : null;
             
             // Checkbox is present in FormData only when checked
             const toTakeAway = formData.get(`to_take_away_${i}`) !== null;
             
-            console.log(`Day ${i}: effort_level raw="${effortLevelValue}", parsed=${effortLevel}, to_take_away raw="${formData.get(`to_take_away_${i}`)}", parsed=${toTakeAway}`);
+            console.log(`Day ${i}: effort_level raw="${effortLevelValue}", parsed=${effortLevelId}, to_take_away raw="${formData.get(`to_take_away_${i}`)}", parsed=${toTakeAway}`);
             
             dailyMenus.push({
                 week_day_number: i,
-                effort_level: effortLevel,
+                effort_level_id: effortLevelId,
                 to_take_away: toTakeAway,
                 menu_id: null
             });

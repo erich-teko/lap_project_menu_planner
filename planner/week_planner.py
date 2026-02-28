@@ -53,9 +53,13 @@ class WeekMenuPlanner:
         if not self._plan_day_menu():
             return None
 
+        if self._planning_result:
+            self._planning_result.daily_menus.sort(key=lambda day_menu: day_menu.week_day_number)
+
         return self._planning_result
 
     def _plan_day_menu(self) -> bool:
+        # If the result object is not initialized, return False
         if not self._planning_result:
             return False
 
@@ -70,7 +74,7 @@ class WeekMenuPlanner:
             DayMenuInfo(
                 week_day_number=day_settings.week_day_number,
                 menu=menu_chosen,
-                effort_level_id=day_settings.effort_level,
+                effort_level_id=day_settings.effort_level_id,
                 to_take_away=day_settings.to_take_away,
             )
         )
@@ -80,15 +84,14 @@ class WeekMenuPlanner:
 
         if self._protein_goal_achieved():
             return True
-        else:
-            self._initialise_planning()
-            self._plan_day_menu()
-        return False
+
+        self._initialise_planning()
+        return self._plan_day_menu()
 
     def _menu_filter(self, day_settings: DaySettings) -> list[MenuInfo]:
         menu_to_choose_from = [menu for menu in self._menus if menu.id and menu.id not in self._used_menu_ids]
         menu_to_choose_from = [
-            menu for menu in menu_to_choose_from if menu.effort_level_id == day_settings.effort_level
+            menu for menu in menu_to_choose_from if menu.effort_level_id == day_settings.effort_level_id
         ]
         menu_to_choose_from = [menu for menu in menu_to_choose_from if self._season_number in menu.season_ids]
         if day_settings.to_take_away:
