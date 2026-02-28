@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -11,11 +11,22 @@ from db_engin import (
     get_all_menu_categories,
     get_all_seasons,
     get_all_week_days,
+    get_last_weeks_menus,
+    get_menu_collection,
     get_menus_with_details,
+    import_example_menu_collection,
+    save_week_planner_result,
 )
-from models.api_models import DaySettings, EffortLevel, MenuInfo, WeekPlannerSettings, create_default_week_planner
+from models.api_models import (
+    DaySettings,
+    MenuInfo,
+    WeekPlannerResult,
+    WeekPlannerSettings,
+    create_default_week_planner,
+)
 from models.base_data import initialize_database
 from models.db_models import Menu
+from planner.week_planner import WeekMenuPlanner
 
 
 @asynccontextmanager
@@ -78,6 +89,9 @@ async def week_planner_page(request: Request):
     effort_levels = get_all_effort_levels()
     week_days = get_all_week_days()
 
+    # Convert SQLModel objects to dictionaries for JSON serialization
+    week_days_dict = [day.model_dump() for day in week_days]
+
     return templates.TemplateResponse(
         "week_planner.html",
         {
@@ -86,26 +100,21 @@ async def week_planner_page(request: Request):
             "default_week": week_planner_default.week_number,
             "default_protein_goal": week_planner_default.protein_goal,
             "effort_levels": effort_levels,
-            "week_days": week_days,
+            "week_days": week_days_dict,
         },
     )
 
 
-@menu_planner.post("/api/week-planner")
+@menu_planner.post("/api/week-planner/start-planning")
 async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     # Convert Pydantic models to dataclass instances
     daily_menus = []
-    for day in planner_settings.daily_menus:
-        effort_level_enum: EffortLevel | None = None
-        if day.effort_level is not None:
-            effort_level_enum = EffortLevel(day.effort_level)
-
+    for day_settings in planner_settings.daily_menus:
         daily_menus.append(
             DaySettings(
-                week_day_number=day.week_day_number,
-                effort_level=effort_level_enum,
-                to_take_away=day.to_take_away,
-                menu_id=day.menu_id,
+                week_day_number=day_settings.week_day_number,
+                effort_level_id=day_settings.effort_level_id,
+                to_take_away=day_settings.to_take_away,
             )
         )
 
@@ -116,11 +125,19 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
         daily_menus=daily_menus,
     )
 
-    # Here you would typically save the week planner to a database
-    # For now, just return the created planner data
-    return {
-        "year": week_planner.year,
-        "week_number": week_planner.week_number,
-        "protein_goal": week_planner.protein_goal,
-        "daily_menus_count": len(week_planner.daily_menus),
-    }
+    menus = get_menu_collection()
+    used_menu_ids = get_last_weeks_menus(4)
+    week_menu_planner = WeekMenuPlanner(menus, week_planner, used_menu_ids)
+    return week_menu_planner.plan_week_menus()
+
+
+@menu_planner.post("/api/menus/import", status_code=status.HTTP_201_CREATED)
+async def import_menus():
+    imported_count = import_example_menu_collection("example/menu_collection.json")
+    return {"imported_menus": imported_count}
+
+
+@menu_planner.post("/api/week-planner", status_code=status.HTTP_201_CREATED)
+async def save_planned_week(week_planner_result: WeekPlannerResult):
+    save_week_planner_result(week_planner_result)
+    return {"message": "Week planner result saved successfully"}

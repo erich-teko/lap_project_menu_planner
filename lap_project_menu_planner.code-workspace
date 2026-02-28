@@ -8,6 +8,8 @@
     "python.testing.pytestArgs": ["test"],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
+    "python.analysis.extraPaths": ["${workspaceFolder}"],
+    "python.envFile": "${workspaceFolder}/.env",
   },
   "launch": {
     "version": "0.2.0",
@@ -18,6 +20,9 @@
         "request": "launch",
         "program": "${file}",
         "console": "integratedTerminal",
+        "env": {
+          "PYTHONPATH": "${workspaceFolder}"
+        }
       },
       {
         "name": "FastAPI Server",
@@ -27,6 +32,9 @@
         "args": ["dev", "main.py", "--port", "8480"],
         "jinja": true,
         "console": "integratedTerminal",
+        "env": {
+          "PYTHONPATH": "${workspaceFolder}"
+        }
       },
     ],
   },

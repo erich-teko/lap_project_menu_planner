@@ -1,18 +1,11 @@
 from datetime import datetime
-from enum import IntEnum
 
 from pydantic import BaseModel
 
 
-class EffortLevel(IntEnum):
-    QUICK = 1
-    MEDIUM = 2
-    COMPLICATED = 3
-
-
 class DaySettings(BaseModel):
     week_day_number: int  # 1=Monday, 7=Sunday
-    effort_level: EffortLevel | None = None
+    effort_level_id: int | None = None
     to_take_away: bool = False
 
 
@@ -48,6 +41,8 @@ class MenuInfo(BaseModel):
 class DayMenuInfo(BaseModel):
     week_day_number: int  # 1=Monday, 7=Sunday
     menu: MenuInfo
+    effort_level_id: int
+    to_take_away: bool = False
 
 
 class WeekPlannerResult(BaseModel):
