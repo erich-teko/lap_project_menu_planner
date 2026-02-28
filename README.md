@@ -44,3 +44,17 @@ Install the enclosed libraries from `requirement.txt`.
 ```bash
 pip install -r requirements.txt
 ```
+To start the devlopment server, run the following command in the terminal:
+
+```bash
+fastapi dev main.py --host 127.0.0.1 --port 8480
+```
+Or direct from VSCode, click on the green play button in the top right corner of the editor.
+
+![VSCode, run devlopment server](images/vscode_run_dev_server.png)
+
+To start the production server, run the following command in the terminal:
+
+```bash
+fastapi run main.py --host 127.0.0.1 --port 8480
+```
