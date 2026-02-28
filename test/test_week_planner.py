@@ -2,7 +2,6 @@ import pytest
 from unit_test_base_functions import load_menus_from_json, load_week_planner_settings_from_json
 
 from exceptions import WeekPlannerInitException
-from models.api_models import WeekPlannerSettings
 from planner.week_planner import WeekMenuPlanner
 
 
@@ -58,3 +57,20 @@ def test_week_planner_in_spring_season():
     assert week_planner_result.year == week_planner_settings.year
     assert week_planner_result.week_number == week_planner_settings.week_number
     assert len(week_planner_result.daily_menus) == 7  # Should have 7 daily menus planned for the week
+    for day_menu in week_planner_result.daily_menus:
+        assert (
+            day_menu.menu.season_ids and planner._season_number in day_menu.menu.season_ids
+        )  # Ensure all planned menus are suitable for Spring
+    for day_menu in week_planner_result.daily_menus:
+        assert day_menu.menu.id not in used_menu_ids  # Ensure no used menus are included
+    for day_menu in week_planner_result.daily_menus:
+        day_setting = next(
+            (
+                setting
+                for setting in week_planner_settings.daily_menus
+                if setting.week_day_number == day_menu.week_day_number
+            ),
+            None,
+        )
+        assert day_menu.menu.effort_level_id == day_setting.effort_level_id
+        assert day_menu.to_take_away == day_setting.to_take_away if day_setting.to_take_away else True
