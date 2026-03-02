@@ -80,7 +80,7 @@ class WeekMenuPlanner:
         )
 
         if self._days_of_the_week_to_plan:
-            self._plan_day_menu()
+            return self._plan_day_menu()
 
         if self._protein_goal_achieved():
             return True
