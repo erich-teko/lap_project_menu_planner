@@ -15,9 +15,9 @@
                     <th>Name</th>
                     <th>Beschreibung</th>
                     <th>Kategorie</th>
-                    <th>Aufwand</th>
-                    <th>Protein (g)</th>
-                    <th>Zum Mitnehmen</th>
+                    <th style="text-align: center;">Aufwand</th>
+                    <th style="text-align: center;">Zum Mitnehmen</th>
+                    <th style="text-align: right;">Protein (g)</th>
                     <th>Saison</th>
                 </tr>
             </thead>
@@ -28,15 +28,15 @@
                         <td>{{ menu.name }}</td>
                         <td>{{ menu.description or '-' }}</td>
                         <td>{{ menu.category_name or '-' }}</td>
-                        <td>{{ menu.effort_name or '-' }}</td>
-                        <td class="protein-value">{{ menu.protein }}</td>
-                        <td>
+                        <td style="text-align: center;">{{ menu.effort_name or '-' }}</td>
+                        <td style="text-align: center;">
                             {% if menu.to_take_away %}
-                                <span class="badge badge-success">Ja</span>
+                            <span class="badge badge-success">Ja</span>
                             {% else %}
-                                <span class="badge badge-secondary">Nein</span>
+                            <span class="badge badge-secondary">Nein</span>
                             {% endif %}
                         </td>
+                        <td class="protein-value" style="text-align: right;">{{ menu.protein }}</td>
                         <td>{{ menu.season_names or '-' }}</td>
                     </tr>
                     {% endfor %}

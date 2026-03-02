@@ -17,13 +17,7 @@ from db_engin import (
     import_example_menu_collection,
     save_week_planner_result,
 )
-from models.api_models import (
-    DaySettings,
-    MenuInfo,
-    WeekPlannerResult,
-    WeekPlannerSettings,
-    create_default_week_planner,
-)
+from models.api_models import DaySettings, MenuInfo, WeekPlannerResult, WeekPlannerSettings, create_default_week_planner
 from models.base_data import initialize_database
 from models.db_models import Menu
 from planner.week_planner import WeekMenuPlanner
@@ -128,7 +122,17 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     menus = get_menu_collection()
     used_menu_ids = get_last_weeks_menus(4)
     week_menu_planner = WeekMenuPlanner(menus, week_planner, used_menu_ids)
-    return week_menu_planner.plan_week_menus()
+    week_planner_result = week_menu_planner.plan_week_menus()
+    if not week_planner_result:
+        return {"message": "No valid week menu plan could be generated with the given settings and available menus."}
+    week_planner_result_dict = week_planner_result.model_dump()
+    effort_levels = get_all_effort_levels()
+
+    for day_menu in week_planner_result_dict["daily_menus"]:
+        effort_level = next((level for level in effort_levels if level.id == day_menu["effort_level_id"]), None)
+        day_menu["effort_level_name"] = effort_level.name if effort_level else "-"
+
+    return week_planner_result_dict
 
 
 @menu_planner.post("/api/menus/import", status_code=status.HTTP_201_CREATED)
