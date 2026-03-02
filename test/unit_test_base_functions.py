@@ -2,7 +2,7 @@ import json
 
 from pydantic import TypeAdapter
 
-from models.api_models import MenuInfo, WeekPlannerSettings
+from models.api_models import MenuInfo, WeekPlannerResult, WeekPlannerSettings
 
 
 def load_menus_from_json(json_file_path: str) -> list[MenuInfo]:
@@ -74,3 +74,37 @@ def load_week_planner_settings_from_json(json_file_path: str) -> WeekPlannerSett
 
     type_adapter = TypeAdapter(WeekPlannerSettings)
     return type_adapter.validate_python(week_planner_settings_py)
+
+
+def load_expected_week_planner_result_from_json(json_file_path: str) -> WeekPlannerResult:
+    """Loads the expected week planner result from a JSON file and returns a WeekPlannerResult object
+
+    Parameters
+    ----------
+    json_file_path : str
+        The file path to the JSON file containing the expected week planner result data
+
+    Returns
+    -------
+    WeekPlannerResult
+        A WeekPlannerResult object loaded from the JSON file
+
+    Raises
+    ------
+    ValueError
+        If the JSON file is empty or does not contain valid week planner result data
+    """
+
+    try:
+        with open(json_file_path, "r") as file:
+            week_planner_result_py = json.load(file)
+    except FileNotFoundError:
+        raise ValueError(f"JSON file not found at {json_file_path}")
+    except json.JSONDecodeError:
+        raise ValueError(f"Invalid JSON format in file at {json_file_path}")
+
+    if not week_planner_result_py:
+        raise ValueError(f"No week planner result found in the JSON file at {json_file_path}")
+
+    type_adapter = TypeAdapter(WeekPlannerResult)
+    return type_adapter.validate_python(week_planner_result_py)

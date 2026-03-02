@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Gebratener Reis mit Ei",
+    "category_id": 2,
+    "effort_level_id": 1,
+    "protein": 18.0,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": true,
+    "description": "Schneller gebratener Reis"
+  },
+  {
+    "name": "Caesar Salad",
+    "category_id": 3,
+    "effort_level_id": 1,
+    "protein": 28.0,
+    "season_ids": [1, 2, 3],
+    "to_take_away": false,
+    "description": "Klassischer Salat mit Hähnchenbrust"
+  },
+  {
+    "name": "Spaghetti Bolognese",
+    "category_id": 1,
+    "effort_level_id": 2,
+    "protein": 28.5,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": true,
+    "description": "Klassische italienische Pasta mit Hackfleischsauce"
+  },
+  {
+    "name": "Minestrone",
+    "category_id": 4,
+    "effort_level_id": 2,
+    "protein": 12.0,
+    "season_ids": [1, 3, 4],
+    "to_take_away": false,
+    "description": "Italienische Gemüsesuppe"
+  },
+  {
+    "name": "Cacciatore",
+    "category_id": 6,
+    "effort_level_id": 3,
+    "protein": 34.0,
+    "season_ids": [1, 3, 4],
+    "to_take_away": true,
+    "description": "Italienisches Jägerfleisch"
+  },
+  {
+    "name": "Käse-Soufflé",
+    "category_id": 11,
+    "effort_level_id": 3,
+    "protein": 22.0,
+    "season_ids": [1, 3, 4],
+    "to_take_away": false,
+    "description": "Französisches Käsesoufflé"
+  }
+]

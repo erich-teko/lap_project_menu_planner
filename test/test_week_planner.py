@@ -1,5 +1,11 @@
+import json
+
 import pytest
-from unit_test_base_functions import load_menus_from_json, load_week_planner_settings_from_json
+from unit_test_base_functions import (
+    load_expected_week_planner_result_from_json,
+    load_menus_from_json,
+    load_week_planner_settings_from_json,
+)
 
 from exceptions import WeekPlannerInitException
 from planner.week_planner import WeekMenuPlanner
@@ -47,6 +53,15 @@ def test_week_planner_with_no_menus():
         WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
 
 
+def test_week_planner_with_too_few_menus():
+    menus = load_menus_from_json("example/menu_collection.json")[:6]  # Only 6 menus available
+    week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
+    used_menu_ids = set()
+    planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
+    week_planner_result = planner.plan_week_menus()
+    assert week_planner_result is None
+
+
 def test_week_planner_in_spring_season():
     menus = load_menus_from_json("example/menu_collection.json")
     week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
@@ -74,3 +89,15 @@ def test_week_planner_in_spring_season():
         )
         assert day_menu.menu.effort_level_id == day_setting.effort_level_id
         assert day_menu.to_take_away == day_setting.to_take_away if day_setting.to_take_away else True
+
+
+def test_week_planner_single_solution():
+    menus = load_menus_from_json("example/menu_collection_minimal.json")
+    week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_minimal.json")
+    used_menu_ids = set()
+    planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
+    week_planner_result = planner.plan_week_menus()
+    expected_solution = load_expected_week_planner_result_from_json(
+        "test/expected_week_planner_result_single_solution.json"
+    )
+    assert week_planner_result == expected_solution
