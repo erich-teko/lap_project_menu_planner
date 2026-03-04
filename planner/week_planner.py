@@ -129,8 +129,8 @@ class WeekMenuPlanner:
             year=self._week_planner_settings.year, week_number=self._week_planner_settings.week_number, daily_menus=[]
         )
 
-    def _sort_by_available_menus(self, day_settings: DaySettings) -> int:
-        return len(self._menu_filter(day_settings))
+    def _sort_by_available_menus(self, day_settings: DaySettings) -> tuple[int, bool, int]:
+        return (len(self._menu_filter(day_settings)), day_settings.to_take_away == False, day_settings.week_day_number)
 
     @staticmethod
     def _calculate_season_number(year: int, week_number: int) -> int:
