@@ -101,3 +101,19 @@ def test_week_planner_single_solution():
         "test/expected_week_planner_result_single_solution.json"
     )
     assert week_planner_result == expected_solution
+
+
+def test_week_planner_multiple_solutions_with_different_results():
+    menus = load_menus_from_json("example/menu_collection.json")
+    week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
+    used_menu_ids = set()
+    planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
+    result_list = set()
+    number_of_iterations = 50
+    for i in range(number_of_iterations):  # Run the planner multiple times to check for different solutions
+        week_planner_result = planner.plan_week_menus()
+        menus_in_result = {day_menu.menu.id for day_menu in week_planner_result.daily_menus}
+        result_list.add(frozenset(menus_in_result))  # Serialize result for comparison
+    assert (
+        len(result_list) == number_of_iterations
+    )  # Expecting 10 different solutions due to randomness in menu selection

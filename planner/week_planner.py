@@ -39,7 +39,7 @@ class WeekMenuPlanner:
         self._used_menu_ids = used_menu_ids
         self._days_of_the_week_to_plan: list[DaySettings] = []
         self._planning_result: WeekPlannerResult | None = None
-        self._initialise_planning()
+        self._multiple_solution_set: set[frozenset[int]] = set()
 
     def plan_week_menus(self) -> WeekPlannerResult | None:
         """Plans the week's menu based on the provided settings and available menus
@@ -49,6 +49,7 @@ class WeekMenuPlanner:
         WeekPlannerResult | None
             A WeekPlannerResult object containing the planned menu for the week, or None if planning is not possible.
         """
+        self._initialise_planning()
 
         if not self._plan_day_menu():
             return None
@@ -82,7 +83,14 @@ class WeekMenuPlanner:
         if self._days_of_the_week_to_plan:
             return self._plan_day_menu()
 
+        menu_id_set = frozenset(day_menu.menu.id for day_menu in self._planning_result.daily_menus if day_menu.menu.id)
+
+        if menu_id_set in self._multiple_solution_set:
+            self._initialise_planning()
+            return self._plan_day_menu()
+
         if self._protein_goal_achieved():
+            self._multiple_solution_set.add(menu_id_set)
             return True
 
         self._initialise_planning()
