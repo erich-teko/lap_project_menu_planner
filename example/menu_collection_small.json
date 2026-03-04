@@ -1,0 +1,119 @@
+[
+  {
+    "name": "Geräucherter Tofu mit Salat",
+    "category_id": 8,
+    "effort_level_id": 1,
+    "protein": 18.0,
+    "season_ids": [1, 2, 3],
+    "to_take_away": true,
+    "description": "Kalte Tofu-Bowl"
+  },
+  {
+    "name": "Pizza Hawaii",
+    "category_id": 13,
+    "effort_level_id": 2,
+    "protein": 22.0,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": true,
+    "description": "Pizza mit Ananas und Schinken"
+  },
+  {
+    "name": "Pastrami-Sandwich",
+    "category_id": 6,
+    "effort_level_id": 1,
+    "protein": 28.0,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": true,
+    "description": "New Yorker Sandwich"
+  },
+  {
+    "name": "Kartoffelkuchen herzhaft",
+    "category_id": 10,
+    "effort_level_id": 2,
+    "protein": 14.0,
+    "season_ids": [1, 3, 4],
+    "to_take_away": true,
+    "description": "Gefüllter Kartoffelkuchen"
+  },
+  {
+    "name": "Spaghetti Carbonara",
+    "category_id": 1,
+    "effort_level_id": 1,
+    "protein": 32.0,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": false,
+    "description": "Cremige Pasta mit Speck und Ei"
+  },
+  {
+    "name": "Ente mit Orangensauce",
+    "category_id": 6,
+    "effort_level_id": 3,
+    "protein": 36.0,
+    "season_ids": [3, 4],
+    "to_take_away": false,
+    "description": "Klassisches französisches Gericht"
+  },
+  {
+    "name": "Tagliatelle mit Pilzrahmsauce",
+    "category_id": 1,
+    "effort_level_id": 2,
+    "protein": 18.0,
+    "season_ids": [3, 4],
+    "to_take_away": false,
+    "description": "Cremige Pilzsauce mit frischen Champignons"
+  },
+  {
+    "name": "Cloud Eggs",
+    "category_id": 7,
+    "effort_level_id": 2,
+    "protein": 16.0,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": false,
+    "description": "Instagram-würdige fluffige Eier"
+  },
+  {
+    "name": "Grünkohl-Wähe",
+    "category_id": 14,
+    "effort_level_id": 2,
+    "protein": 16.0,
+    "season_ids": [4],
+    "to_take_away": false,
+    "description": "Winterliche Wähe"
+  },
+  {
+    "name": "Knuspriger Tofu im Wok",
+    "category_id": 8,
+    "effort_level_id": 2,
+    "protein": 24.0,
+    "season_ids": [1, 2, 3, 4],
+    "to_take_away": true,
+    "description": "Asiatisch gewürzter Tofu"
+  },
+  {
+    "name": "Tofu-Poke-Bowl",
+    "category_id": 8,
+    "effort_level_id": 2,
+    "protein": 20.0,
+    "season_ids": [1, 2, 3],
+    "to_take_away": true,
+    "description": "Hawaii-Bowl mit Tofu"
+  },
+  {
+    "name": "Geräucherter Tofu mit Salat",
+    "category_id": 8,
+    "effort_level_id": 1,
+    "protein": 18.0,
+    "season_ids": [1, 2, 3],
+    "to_take_away": true,
+    "description": "Kalte Tofu-Bowl"
+  },
+  {
+    "name": "Seeteufel mit Speck",
+    "category_id": 9,
+    "effort_level_id": 3,
+    "protein": 34.0,
+    "season_ids": [1, 3, 4],
+    "to_take_away": true,
+    "description": "Edelfisch umwickelt mit Speck"
+  }
+]
