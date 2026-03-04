@@ -1,0 +1,42 @@
+{
+  "year": 2026,
+  "week_number": 40,
+  "protein_goal": 200,
+  "daily_menus": [
+    {
+      "week_day_number": 1,
+      "effort_level_id": 2,
+      "to_take_away": true
+    },
+    {
+      "week_day_number": 2,
+      "effort_level_id": 1,
+      "to_take_away": false
+    },
+    {
+      "week_day_number": 3,
+      "effort_level_id": 2,
+      "to_take_away": true
+    },
+    {
+      "week_day_number": 4,
+      "effort_level_id": 2,
+      "to_take_away": true
+    },
+    {
+      "week_day_number": 5,
+      "effort_level_id": 2,
+      "to_take_away": false
+    },
+    {
+      "week_day_number": 6,
+      "effort_level_id": 1,
+      "to_take_away": false
+    },
+    {
+      "week_day_number": 7,
+      "effort_level_id": 3,
+      "to_take_away": true
+    }
+  ]
+}
