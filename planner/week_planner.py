@@ -39,7 +39,7 @@ class WeekMenuPlanner:
         self._used_menu_ids = used_menu_ids
         self._days_of_the_week_to_plan: list[DaySettings] = []
         self._planning_result: WeekPlannerResult | None = None
-        self._initialise_planning()
+        self._multiple_solution_set: set[frozenset[int]] = set()
 
     def plan_week_menus(self) -> WeekPlannerResult | None:
         """Plans the week's menu based on the provided settings and available menus
@@ -49,6 +49,7 @@ class WeekMenuPlanner:
         WeekPlannerResult | None
             A WeekPlannerResult object containing the planned menu for the week, or None if planning is not possible.
         """
+        self._initialise_planning()
 
         if not self._plan_day_menu():
             return None
@@ -80,9 +81,16 @@ class WeekMenuPlanner:
         )
 
         if self._days_of_the_week_to_plan:
-            self._plan_day_menu()
+            return self._plan_day_menu()
+
+        menu_id_set = frozenset(day_menu.menu.id for day_menu in self._planning_result.daily_menus if day_menu.menu.id)
+
+        if menu_id_set in self._multiple_solution_set:
+            self._initialise_planning()
+            return self._plan_day_menu()
 
         if self._protein_goal_achieved():
+            self._multiple_solution_set.add(menu_id_set)
             return True
 
         self._initialise_planning()
@@ -121,8 +129,8 @@ class WeekMenuPlanner:
             year=self._week_planner_settings.year, week_number=self._week_planner_settings.week_number, daily_menus=[]
         )
 
-    def _sort_by_available_menus(self, day_settings: DaySettings) -> int:
-        return len(self._menu_filter(day_settings))
+    def _sort_by_available_menus(self, day_settings: DaySettings) -> tuple[int, bool, int]:
+        return (len(self._menu_filter(day_settings)), day_settings.to_take_away == False, day_settings.week_day_number)
 
     @staticmethod
     def _calculate_season_number(year: int, week_number: int) -> int:

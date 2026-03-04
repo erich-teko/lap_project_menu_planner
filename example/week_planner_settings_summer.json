@@ -1,7 +1,7 @@
 {
   "year": 2026,
-  "week_number": 10,
-  "protein_goal": 180,
+  "week_number": 25,
+  "protein_goal": 160,
   "daily_menus": [
     {
       "week_day_number": 1,
@@ -10,12 +10,12 @@
     },
     {
       "week_day_number": 2,
-      "effort_level_id": 2,
+      "effort_level_id": 1,
       "to_take_away": true
     },
     {
       "week_day_number": 3,
-      "effort_level_id": 1,
+      "effort_level_id": 2,
       "to_take_away": true
     },
     {
@@ -30,7 +30,7 @@
     },
     {
       "week_day_number": 6,
-      "effort_level_id": 1,
+      "effort_level_id": 3,
       "to_take_away": false
     },
     {

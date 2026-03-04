@@ -38,7 +38,7 @@
                         <tr>
                             <th>Tag</th>
                             <th>Aufwand *</th>
-                            <th>Zum Mitnehmen</th>
+                            <th style="text-align: center;">Zum Mitnehmen</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,7 +82,9 @@
                         <tr>
                             <th>Tag</th>
                             <th>Menü</th>
-                            <th>Protein (g)</th>
+                            <th style="text-align: center;">Aufwand</th>
+                            <th style="text-align: center;">Zum Mitnehmen</th>
+                            <th style="text-align: right;">Protein (g)</th>
                         </tr>
                     </thead>
                     <tbody id="resultTableBody">
@@ -90,8 +92,8 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="2" style="text-align: right;">Summe Protein:</th>
-                            <th id="totalProtein">0.0</th>
+                            <th colspan="4" style="text-align: right;">Summe Protein:</th>
+                            <th id="totalProtein" style="text-align: right;">0.0</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -200,6 +202,15 @@
             
             const menuCell = document.createElement('td');
             menuCell.textContent = dayMenu.menu.name;
+            const effortLevelCell = document.createElement('td');
+            effortLevelCell.textContent = dayMenu.effort_level_name;
+            effortLevelCell.style.textAlign = 'center';
+            const toTakeAwayCell = document.createElement('td');
+            const toTakeAwaySpan = document.createElement('span');
+            toTakeAwaySpan.textContent = dayMenu.to_take_away ? 'Ja' : 'Nein';
+            toTakeAwaySpan.className = dayMenu.to_take_away ? "badge badge-success" : "badge badge-secondary";
+            toTakeAwayCell.style.textAlign = 'center';
+            toTakeAwayCell.appendChild(toTakeAwaySpan);
             
             const proteinCell = document.createElement('td');
             proteinCell.textContent = dayMenu.menu.protein.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
@@ -207,6 +218,8 @@
             
             row.appendChild(dayCell);
             row.appendChild(menuCell);
+            row.appendChild(effortLevelCell);
+            row.appendChild(toTakeAwayCell);
             row.appendChild(proteinCell);
             tbody.appendChild(row);
             
