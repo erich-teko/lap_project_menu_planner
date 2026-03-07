@@ -193,8 +193,8 @@
                 closeModal();
                 setTimeout(() => location.reload(), 1500);
             } else {
-                const error = await response.json();
-                showMessage('Fehler beim Erstellen des Menüs: ' + (error.detail || 'Unbekannter Fehler'), 'error');
+                const errorMsg = await getErrorMessage(response);
+                showMessage('Fehler beim Erstellen des Menüs: ' + errorMsg, 'error');
             }
         } catch (error) {
             showMessage('Fehler beim Erstellen des Menüs: ' + error.message, 'error');
@@ -213,8 +213,8 @@
                     showMessage('Beispiel-Menüs erfolgreich importiert! Anzahl importierter Menüs: ' + result.imported_menus.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}), 'success');
                     setTimeout(() => location.reload(), 2000);
                 } else {
-                    const error = await response.json();
-                    showMessage('Fehler beim Importieren der Beispiel-Menüs: ' + (error.detail || 'Unbekannter Fehler'), 'error');
+                    const errorMsg = await getErrorMessage(response);
+                    showMessage('Fehler beim Importieren der Beispiel-Menüs: ' + errorMsg, 'error');
                 }
             } catch (error) {
                 showMessage('Fehler beim Importieren der Beispiel-Menüs: ' + error.message, 'error');

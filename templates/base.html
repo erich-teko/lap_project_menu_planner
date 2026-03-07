@@ -80,6 +80,25 @@
     </div>
 
     <script>
+        // Helper function to safely parse error responses
+        async function getErrorMessage(response) {
+            const contentType = response.headers.get('content-type');
+            
+            try {
+                if (contentType && contentType.includes('application/json')) {
+                    const error = await response.json();
+                    return error.detail || error.message || 'Unbekannter Fehler';
+                } else {
+                    // If it's not JSON, get the text
+                    const text = await response.text();
+                    // Return a user-friendly message instead of HTML/technical details
+                    return `Server-Fehler (Status ${response.status}): Bitte versuchen Sie es später erneut.`;
+                }
+            } catch (e) {
+                return `Server-Fehler (Status ${response.status}): Bitte versuchen Sie es später erneut.`;
+            }
+        }
+
         // Custom Message Box System
         function showMessage(message, type = 'info') {
             const modal = document.getElementById('messageModal');

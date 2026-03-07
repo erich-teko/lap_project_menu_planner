@@ -169,8 +169,8 @@
                 const result = await response.json();
                 displayWeekPlannerResult(result);
             } else {
-                const error = await response.json();
-                showMessage('Fehler beim Erstellen des Wochenplans: ' + (error.detail || 'Unbekannter Fehler'), 'error');
+                const errorMsg = await getErrorMessage(response);
+                showMessage('Fehler beim Erstellen des Wochenplans: ' + errorMsg, 'error');
             }
         } catch (error) {
             showMessage('Fehler beim Erstellen des Wochenplans: ' + error.message, 'error');
@@ -255,8 +255,8 @@
                 const result = await response.json();
                 showMessage('Wochenplan erfolgreich in der Datenbank gespeichert!', 'success');
             } else {
-                const error = await response.json();
-                showMessage('Fehler beim Speichern: ' + (error.detail || 'Unbekannter Fehler'), 'error');
+                const errorMsg = await getErrorMessage(response);
+                showMessage('Fehler beim Speichern: ' + errorMsg, 'error');
             }
         } catch (error) {
             showMessage('Fehler beim Speichern: ' + error.message, 'error');
