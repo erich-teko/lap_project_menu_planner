@@ -206,6 +206,45 @@ def save_week_planner_result(week_planner_result: WeekPlannerResult):
             session.commit()
 
 
+def get_planner_result_by_year_and_week(year: int, week_number: int) -> WeekPlannerResult | None:
+    with Session(engine) as session:
+        week_planning_result_record = session.exec(
+            select(WeekPlanningResult).where(
+                (WeekPlanningResult.year == year) & (WeekPlanningResult.week_number == week_number)
+            )
+        ).first()
+
+        if not week_planning_result_record:
+            return None
+
+        day_menu_records = session.exec(
+            select(DayMenuResult).where(DayMenuResult.week_planning_result_id == week_planning_result_record.id)
+        ).all()
+
+        week_day_records = session.exec(select(WeekDay)).all()
+        week_day_id_to_number_map = {week_day.id: week_day.week_day_number for week_day in week_day_records}
+
+        daily_menus = []
+        for day_menu_record in day_menu_records:
+            menu = session.get(Menu, day_menu_record.menu_id)
+            season_ids = list(
+                session.exec(select(MenuSeasonLink.season_id).where(MenuSeasonLink.menu_id == menu.id)).all()
+            )
+            daily_menu_result = DayMenuInfo(
+                week_day_number=week_day_id_to_number_map[day_menu_record.week_day_id],
+                menu=get_menu_info_from_menu(menu, season_ids),  # Season IDs are not needed for the planner result
+                effort_level_id=day_menu_record.effort_level_id,
+                to_take_away=day_menu_record.to_take_away,
+            )
+            daily_menus.append(daily_menu_result)
+
+        return WeekPlannerResult(
+            year=week_planning_result_record.year,
+            week_number=week_planning_result_record.week_number,
+            daily_menus=daily_menus,
+        )
+
+
 def get_menu_info_from_menu(menu: Menu, season_ids: list[int]) -> MenuInfo:
     return MenuInfo(
         id=menu.id,

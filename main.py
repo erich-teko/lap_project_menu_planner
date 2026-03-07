@@ -14,6 +14,7 @@ from db_engin import (
     get_last_weeks_menus,
     get_menu_collection,
     get_menus_with_details,
+    get_planner_result_by_year_and_week,
     import_example_menu_collection,
     save_week_planner_result,
 )
@@ -154,3 +155,13 @@ async def save_planned_week(week_planner_result: WeekPlannerResult):
         save_week_planner_result(week_planner_result)
     except WeekPlannerSaveException as exception:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
+
+
+@menu_planner.get("/api/week-planner/{year}/{week_number}")
+async def get_planner_result(year: int, week_number: int):
+    planner_result = get_planner_result_by_year_and_week(year, week_number)
+    if not planner_result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Keine Planung für die angegebene Woche gefunden."
+        )
+    return planner_result.model_dump()
