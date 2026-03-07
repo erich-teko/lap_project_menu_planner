@@ -109,6 +109,7 @@
 <script>
     const weekDays = {{ week_days | tojson }};
     let currentWeekPlannerResult = null;
+    let isLoadedFromDatabase = false;
     
     // Check for existing planning result when year or week changes
     async function checkExistingPlan() {
@@ -142,7 +143,7 @@
                 });
                 
                 // Display the result
-                displayWeekPlannerResult(result);
+                displayWeekPlannerResult(result, true);
                 
                 // Show info message
                 showMessage(`Wochenplan für KW ${weekNumber}/${year} wurde geladen.`, 'info');
@@ -150,6 +151,8 @@
                 // No existing plan - clear result display
                 document.getElementById('weekPlannerResult').style.display = 'none';
                 currentWeekPlannerResult = null;
+                isLoadedFromDatabase = false;
+                updateSaveButtonState();
             } else {
                 // Other error
                 const errorMsg = await getErrorMessage(response);
@@ -181,6 +184,9 @@
         if (await showConfirm('Möchten Sie wirklich alle Eingaben zurücksetzen?', 'Formular zurücksetzen')) {
             document.getElementById('weekPlannerForm').reset();
             document.getElementById('weekPlannerResult').style.display = 'none';
+            currentWeekPlannerResult = null;
+            isLoadedFromDatabase = false;
+            updateSaveButtonState();
         }
     }
 
@@ -229,7 +235,7 @@
             
             if (response.ok) {
                 const result = await response.json();
-                displayWeekPlannerResult(result);
+                displayWeekPlannerResult(result, false);
             } else {
                 const errorMsg = await getErrorMessage(response);
                 showMessage('Fehler beim Erstellen des Wochenplans: ' + errorMsg, 'error');
@@ -239,9 +245,11 @@
         }
     }
     
-    function displayWeekPlannerResult(result) {
+    function displayWeekPlannerResult(result, fromDatabase = false) {
         // Store the result for later saving
         currentWeekPlannerResult = result;
+        isLoadedFromDatabase = fromDatabase;
+        updateSaveButtonState();
         
         // Update header
         document.getElementById('resultWeek').textContent = result.week_number;
@@ -316,12 +324,31 @@
             if (response.ok) {
                 const result = await response.json();
                 showMessage('Wochenplan erfolgreich in der Datenbank gespeichert!', 'success');
+                isLoadedFromDatabase = true;
+                updateSaveButtonState();
             } else {
                 const errorMsg = await getErrorMessage(response);
                 showMessage('Fehler beim Speichern: ' + errorMsg, 'error');
             }
         } catch (error) {
             showMessage('Fehler beim Speichern: ' + error.message, 'error');
+        }
+    }
+    
+    function updateSaveButtonState() {
+        const saveButton = document.querySelector('button[onclick="saveWeekPlanner()"]');
+        if (saveButton) {
+            if (isLoadedFromDatabase) {
+                saveButton.disabled = true;
+                saveButton.style.opacity = '0.5';
+                saveButton.style.cursor = 'not-allowed';
+                saveButton.title = 'Dieser Wochenplan wurde bereits gespeichert';
+            } else {
+                saveButton.disabled = false;
+                saveButton.style.opacity = '1';
+                saveButton.style.cursor = 'pointer';
+                saveButton.title = 'Wochenplanung in der Datenbank speichern';
+            }
         }
     }
 </script>
