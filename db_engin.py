@@ -82,6 +82,8 @@ def get_menues(limit: int = 20) -> list[Menu]:
 
 def create_menu(menu: Menu, season_ids: list[int]) -> Menu:
     with Session(engine) as session:
+        if session.exec(select(Menu).where(Menu.name == menu.name)).first():
+            raise ValueError(f"A menu with the name '{menu.name}' already exists.")
         session.add(menu)
         session.commit()
 
