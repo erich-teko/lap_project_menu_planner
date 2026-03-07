@@ -205,12 +205,15 @@ def test_week_planner_multiple_solutions_with_different_results():
         len(result_list) == number_of_iterations
     )  # Expecting 10 different solutions due to randomness in menu selection
 
-def test_week_planner_enough_menus_but_no_solution():
+def test_week_planner_enough_menus_but_already_in_use_no_solution():
     menus = load_menus_from_json("example/menu_collection_small.json")
     week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
+    # First round with no used menus to find a valid plan
+    used_menu_ids = set()
+    planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
+    assert planner.plan_week_menus() is not None  # Expecting a valid plan to be found
     # Assuming these IDs correspond to the only menus that would fit the settings,
     # making it impossible to find a valid plan
     used_menu_ids = {1, 2, 3}
     planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
-    week_planner_result = planner.plan_week_menus()
-    assert week_planner_result is None  # Expecting no solution to be found
+    assert planner.plan_week_menus() is None  # Expecting no solution to be found
