@@ -4,7 +4,7 @@ from pydantic import TypeAdapter
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from exceptions import WeekPlannerSaveException
-from models.api_models import MenuInfo, WeekPlannerResult
+from models.api_models import DayMenuInfo, MenuInfo, WeekPlannerResult
 from models.db_models import *
 
 sqlite_file_name = "database.db"
@@ -49,15 +49,7 @@ def get_menu_collection() -> list[MenuInfo]:
         menu_collection = []
         for menu in menus:
             season_ids = [season.season_id for season in menu_seasons if season.menu_id == menu.id]
-            menu_info = MenuInfo(
-                id=menu.id,
-                name=menu.name,
-                category_id=menu.category_id,
-                effort_level_id=menu.effort_level_id,
-                to_take_away=menu.to_take_away,
-                protein=menu.protein,
-                season_ids=season_ids,
-            )
+            menu_info = get_menu_info_from_menu(menu, season_ids)
             menu_collection.append(menu_info)
         return menu_collection
 
@@ -212,3 +204,15 @@ def save_week_planner_result(week_planner_result: WeekPlannerResult):
                 )
                 session.add(daily_menu_result_record)
             session.commit()
+
+
+def get_menu_info_from_menu(menu: Menu, season_ids: list[int]) -> MenuInfo:
+    return MenuInfo(
+        id=menu.id,
+        name=menu.name,
+        category_id=menu.category_id,
+        effort_level_id=menu.effort_level_id,
+        to_take_away=menu.to_take_away,
+        protein=menu.protein,
+        season_ids=season_ids,
+    )
