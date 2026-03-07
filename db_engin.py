@@ -83,7 +83,7 @@ def get_menues(limit: int = 20) -> list[Menu]:
 def create_menu(menu: Menu, season_ids: list[int]) -> Menu:
     with Session(engine) as session:
         if session.exec(select(Menu).where(Menu.name == menu.name)).first():
-            raise ValueError(f"A menu with the name '{menu.name}' already exists.")
+            raise ValueError(f"Ein Menü mit dem Namen '{menu.name}' existiert bereits.")
         session.add(menu)
         session.commit()
 
@@ -146,12 +146,12 @@ def import_example_menu_collection(json_file_path: str) -> int:
         with open(json_file_path, "r") as file:
             menu_collection_py = json.load(file)
     except FileNotFoundError:
-        raise ValueError(f"JSON file not found at {json_file_path}")
+        raise ValueError(f"JSON Datei nicht gefunden: {json_file_path}")
     except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON format in file at {json_file_path}")
+        raise ValueError(f"Ungültiges JSON-Format in der Datei: {json_file_path}")
 
     if not menu_collection_py:
-        raise ValueError(f"No menus found in the JSON file at {json_file_path}")
+        raise ValueError(f"Keine Menüs in der JSON-Datei gefunden: {json_file_path}")
 
     type_adapter = TypeAdapter(list[MenuInfo])
     menu_collection = type_adapter.validate_python(menu_collection_py)
@@ -192,9 +192,7 @@ def save_week_planner_result(week_planner_result: WeekPlannerResult):
                 & (WeekPlanningResult.week_number == week_planner_result.week_number)
             )
         ).first():
-            raise WeekPlannerSaveException(
-                "A week planner result for the specified year and week number already exists."
-            )
+            raise WeekPlannerSaveException("Eine Planung für die angegebene Woche existiert bereits.")
         week_days = session.exec(select(WeekDay)).all()
         week_day_number_to_id = {week_day.week_day_number: week_day.id for week_day in week_days}
         week_planning_result_record = WeekPlanningResult(

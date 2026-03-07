@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -17,6 +17,7 @@ from db_engin import (
     import_example_menu_collection,
     save_week_planner_result,
 )
+from exceptions import WeekPlannerSaveException
 from models.api_models import DaySettings, MenuInfo, WeekPlannerResult, WeekPlannerSettings, create_default_week_planner
 from models.base_data import initialize_database
 from models.db_models import Menu
@@ -62,7 +63,7 @@ async def menu_collection(request: Request):
     )
 
 
-@menu_planner.post("/api/menus")
+@menu_planner.post("/api/menus", status_code=status.HTTP_201_CREATED)
 async def create_menu_api(menu_data: MenuInfo):
     menu = Menu(
         name=menu_data.name,
@@ -73,8 +74,11 @@ async def create_menu_api(menu_data: MenuInfo):
         protein=menu_data.protein,
     )
 
-    created_menu = create_menu(menu, menu_data.season_ids)
-    return {"id": created_menu.id, "name": created_menu.name}
+    try:
+        created_menu = create_menu(menu, menu_data.season_ids)
+        return {"id": created_menu.id, "name": created_menu.name}
+    except ValueError as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
 
 
 @menu_planner.get("/week-planner", response_class=HTMLResponse, name="week_planner")
@@ -137,11 +141,16 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
 
 @menu_planner.post("/api/menus/import", status_code=status.HTTP_201_CREATED)
 async def import_menus():
-    imported_count = import_example_menu_collection("example/menu_collection.json")
-    return {"imported_menus": imported_count}
+    try:
+        imported_count = import_example_menu_collection("example/menu_collection.json")
+        return {"imported_menus": imported_count}
+    except (FileNotFoundError, ValueError, ValueError) as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
 
 
 @menu_planner.post("/api/week-planner", status_code=status.HTTP_201_CREATED)
 async def save_planned_week(week_planner_result: WeekPlannerResult):
-    save_week_planner_result(week_planner_result)
-    return {"message": "Week planner result saved successfully"}
+    try:
+        save_week_planner_result(week_planner_result)
+    except WeekPlannerSaveException as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
