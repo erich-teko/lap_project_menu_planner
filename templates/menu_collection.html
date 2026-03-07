@@ -165,7 +165,7 @@
             .map(cb => parseInt(cb.value));
         
         if (seasonIds.length === 0) {
-            alert('Bitte wählen Sie mindestens eine Saison aus.');
+            showMessage('Bitte wählen Sie mindestens eine Saison aus.', 'warning');
             return;
         }
         
@@ -189,20 +189,20 @@
             });
             
             if (response.ok) {
-                alert('Menü erfolgreich erstellt!');
+                showMessage('Menü erfolgreich erstellt!', 'success');
                 closeModal();
-                location.reload();
+                setTimeout(() => location.reload(), 1500);
             } else {
                 const error = await response.json();
-                alert('Fehler beim Erstellen des Menüs: ' + (error.detail || 'Unbekannter Fehler'));
+                showMessage('Fehler beim Erstellen des Menüs: ' + (error.detail || 'Unbekannter Fehler'), 'error');
             }
         } catch (error) {
-            alert('Fehler beim Erstellen des Menüs: ' + error.message);
+            showMessage('Fehler beim Erstellen des Menüs: ' + error.message, 'error');
         }
     }
 
     async function importExampleMenus() {
-        if (confirm('Möchten Sie die Beispiel-Menüs importieren? Bestehende Menüs bleiben erhalten.')) {
+        if (await showConfirm('Möchten Sie die Beispiel-Menüs importieren? Bestehende Menüs bleiben erhalten.', 'Beispiel-Menüs importieren')) {
             try {
                 const response = await fetch('/api/menus/import', {
                     method: 'POST'
@@ -210,14 +210,14 @@
                 
                 if (response.ok) {
                     const result = await response.json();
-                    alert('Beispiel-Menüs erfolgreich importiert! Anzahl importierter Menüs: ' + result.imported_menus.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}));
-                    location.reload();
+                    showMessage('Beispiel-Menüs erfolgreich importiert! Anzahl importierter Menüs: ' + result.imported_menus.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}), 'success');
+                    setTimeout(() => location.reload(), 2000);
                 } else {
                     const error = await response.json();
-                    alert('Fehler beim Importieren der Beispiel-Menüs: ' + (error.detail || 'Unbekannter Fehler'));
+                    showMessage('Fehler beim Importieren der Beispiel-Menüs: ' + (error.detail || 'Unbekannter Fehler'), 'error');
                 }
             } catch (error) {
-                alert('Fehler beim Importieren der Beispiel-Menüs: ' + error.message);
+                showMessage('Fehler beim Importieren der Beispiel-Menüs: ' + error.message, 'error');
             }
         }
     }
