@@ -188,7 +188,9 @@ def save_week_planner_result(week_planner_result: WeekPlannerResult):
         week_days = session.exec(select(WeekDay)).all()
         week_day_number_to_id = {week_day.week_day_number: week_day.id for week_day in week_days}
         week_planning_result_record = WeekPlanningResult(
-            year=week_planner_result.year, week_number=week_planner_result.week_number
+            year=week_planner_result.year,
+            week_number=week_planner_result.week_number,
+            protein_goal=week_planner_result.protein_goal,
         )
         session.add(week_planning_result_record)
         session.commit()
@@ -241,6 +243,7 @@ def get_planner_result_by_year_and_week(year: int, week_number: int) -> WeekPlan
         return WeekPlannerResult(
             year=week_planning_result_record.year,
             week_number=week_planning_result_record.week_number,
+            protein_goal=week_planning_result_record.protein_goal,
             daily_menus=daily_menus,
         )
 

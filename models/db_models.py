@@ -47,6 +47,7 @@ class WeekPlanningResult(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     year: int = Field(index=True)
     week_number: int = Field(index=True)
+    protein_goal: float
     __table_args__ = (
         UniqueConstraint("year", "week_number", name="unique_year_week"),
     )

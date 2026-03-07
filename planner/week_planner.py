@@ -126,7 +126,10 @@ class WeekMenuPlanner:
         self._days_of_the_week_to_plan = deepcopy(self._week_planner_settings.daily_menus)
         self._days_of_the_week_to_plan.sort(key=self._sort_by_available_menus)
         self._planning_result = WeekPlannerResult(
-            year=self._week_planner_settings.year, week_number=self._week_planner_settings.week_number, daily_menus=[]
+            year=self._week_planner_settings.year,
+            week_number=self._week_planner_settings.week_number,
+            protein_goal=self._week_planner_settings.protein_goal,
+            daily_menus=[],
         )
 
     def _sort_by_available_menus(self, day_settings: DaySettings) -> tuple[int, bool, int]:
