@@ -4,7 +4,7 @@ from pydantic import TypeAdapter
 from sqlmodel import Session, SQLModel, create_engine, select
 
 from exceptions import WeekPlannerSaveException
-from models.api_models import MenuInfo, WeekPlannerResult
+from models.api_models import DayMenuInfo, MenuInfo, WeekPlannerResult
 from models.db_models import *
 
 sqlite_file_name = "database.db"
@@ -49,15 +49,7 @@ def get_menu_collection() -> list[MenuInfo]:
         menu_collection = []
         for menu in menus:
             season_ids = [season.season_id for season in menu_seasons if season.menu_id == menu.id]
-            menu_info = MenuInfo(
-                id=menu.id,
-                name=menu.name,
-                category_id=menu.category_id,
-                effort_level_id=menu.effort_level_id,
-                to_take_away=menu.to_take_away,
-                protein=menu.protein,
-                season_ids=season_ids,
-            )
+            menu_info = get_menu_info_from_menu(menu, season_ids)
             menu_collection.append(menu_info)
         return menu_collection
 
@@ -82,6 +74,8 @@ def get_menues(limit: int = 20) -> list[Menu]:
 
 def create_menu(menu: Menu, season_ids: list[int]) -> Menu:
     with Session(engine) as session:
+        if session.exec(select(Menu).where(Menu.name == menu.name)).first():
+            raise ValueError(f"Ein Menü mit dem Namen '{menu.name}' existiert bereits.")
         session.add(menu)
         session.commit()
 
@@ -144,12 +138,12 @@ def import_example_menu_collection(json_file_path: str) -> int:
         with open(json_file_path, "r") as file:
             menu_collection_py = json.load(file)
     except FileNotFoundError:
-        raise ValueError(f"JSON file not found at {json_file_path}")
+        raise ValueError(f"JSON Datei nicht gefunden: {json_file_path}")
     except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON format in file at {json_file_path}")
+        raise ValueError(f"Ungültiges JSON-Format in der Datei: {json_file_path}")
 
     if not menu_collection_py:
-        raise ValueError(f"No menus found in the JSON file at {json_file_path}")
+        raise ValueError(f"Keine Menüs in der JSON-Datei gefunden: {json_file_path}")
 
     type_adapter = TypeAdapter(list[MenuInfo])
     menu_collection = type_adapter.validate_python(menu_collection_py)
@@ -190,13 +184,13 @@ def save_week_planner_result(week_planner_result: WeekPlannerResult):
                 & (WeekPlanningResult.week_number == week_planner_result.week_number)
             )
         ).first():
-            raise WeekPlannerSaveException(
-                "A week planner result for the specified year and week number already exists."
-            )
+            raise WeekPlannerSaveException("Eine Planung für die angegebene Woche existiert bereits.")
         week_days = session.exec(select(WeekDay)).all()
         week_day_number_to_id = {week_day.week_day_number: week_day.id for week_day in week_days}
         week_planning_result_record = WeekPlanningResult(
-            year=week_planner_result.year, week_number=week_planner_result.week_number
+            year=week_planner_result.year,
+            week_number=week_planner_result.week_number,
+            protein_goal=week_planner_result.protein_goal,
         )
         session.add(week_planning_result_record)
         session.commit()
@@ -212,3 +206,55 @@ def save_week_planner_result(week_planner_result: WeekPlannerResult):
                 )
                 session.add(daily_menu_result_record)
             session.commit()
+
+
+def get_planner_result_by_year_and_week(year: int, week_number: int) -> WeekPlannerResult | None:
+    with Session(engine) as session:
+        week_planning_result_record = session.exec(
+            select(WeekPlanningResult).where(
+                (WeekPlanningResult.year == year) & (WeekPlanningResult.week_number == week_number)
+            )
+        ).first()
+
+        if not week_planning_result_record:
+            return None
+
+        day_menu_records = session.exec(
+            select(DayMenuResult).where(DayMenuResult.week_planning_result_id == week_planning_result_record.id)
+        ).all()
+
+        week_day_records = session.exec(select(WeekDay)).all()
+        week_day_id_to_number_map = {week_day.id: week_day.week_day_number for week_day in week_day_records}
+
+        daily_menus = []
+        for day_menu_record in day_menu_records:
+            menu = session.get(Menu, day_menu_record.menu_id)
+            season_ids = list(
+                session.exec(select(MenuSeasonLink.season_id).where(MenuSeasonLink.menu_id == menu.id)).all()
+            )
+            daily_menu_result = DayMenuInfo(
+                week_day_number=week_day_id_to_number_map[day_menu_record.week_day_id],
+                menu=get_menu_info_from_menu(menu, season_ids),  # Season IDs are not needed for the planner result
+                effort_level_id=day_menu_record.effort_level_id,
+                to_take_away=day_menu_record.to_take_away,
+            )
+            daily_menus.append(daily_menu_result)
+
+        return WeekPlannerResult(
+            year=week_planning_result_record.year,
+            week_number=week_planning_result_record.week_number,
+            protein_goal=week_planning_result_record.protein_goal,
+            daily_menus=daily_menus,
+        )
+
+
+def get_menu_info_from_menu(menu: Menu, season_ids: list[int]) -> MenuInfo:
+    return MenuInfo(
+        id=menu.id,
+        name=menu.name,
+        category_id=menu.category_id,
+        effort_level_id=menu.effort_level_id,
+        to_take_away=menu.to_take_away,
+        protein=menu.protein,
+        season_ids=season_ids,
+    )

@@ -48,4 +48,5 @@ class DayMenuInfo(BaseModel):
 class WeekPlannerResult(BaseModel):
     year: int
     week_number: int
+    protein_goal: float
     daily_menus: list[DayMenuInfo]  # List of 7 DayMenuInfo objects

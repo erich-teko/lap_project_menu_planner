@@ -44,6 +44,205 @@
         <!-- Main Content -->
         <main class="main-content">{% block content %}{% endblock %}</main>
     </div>
+
+    <!-- Custom Message Box Modal -->
+    <div id="messageModal" class="message-modal">
+        <div class="message-box">
+            <div class="message-icon-container">
+                <svg class="message-icon" id="messageIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <!-- Icon will be set dynamically -->
+                </svg>
+            </div>
+            <h3 class="message-title" id="messageTitle">Nachricht</h3>
+            <p class="message-text" id="messageText">Nachrichtentext</p>
+            <button class="message-button" id="messageButton">OK</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Dialog -->
+    <div id="confirmModal" class="message-modal">
+        <div class="message-box message-info">
+            <div class="message-icon-container">
+                <svg class="message-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9 9h0.01M15 9h0.01"></path>
+                    <path d="M10 16s1 1 2 1 2-1 2-1"></path>
+                    <path d="M8 13h8"></path>
+                </svg>
+            </div>
+            <h3 class="message-title" id="confirmTitle">Bestätigung</h3>
+            <p class="message-text" id="confirmText">Möchten Sie fortfahren?</p>
+            <div class="message-button-group">
+                <button class="message-button message-button-cancel" id="confirmCancelBtn">Abbrechen</button>
+                <button class="message-button message-button-confirm" id="confirmOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to safely parse error responses
+        async function getErrorMessage(response) {
+            const contentType = response.headers.get('content-type');
+            
+            try {
+                if (contentType && contentType.includes('application/json')) {
+                    const error = await response.json();
+                    return error.detail || error.message || 'Unbekannter Fehler';
+                } else {
+                    // If it's not JSON, get the text
+                    const text = await response.text();
+                    // Return a user-friendly message instead of HTML/technical details
+                    return `Server-Fehler (Status ${response.status}): Bitte versuchen Sie es später erneut.`;
+                }
+            } catch (e) {
+                return `Server-Fehler (Status ${response.status}): Bitte versuchen Sie es später erneut.`;
+            }
+        }
+
+        // Custom Message Box System
+        function showMessage(message, type = 'info') {
+            const modal = document.getElementById('messageModal');
+            const messageBox = modal.querySelector('.message-box');
+            const icon = document.getElementById('messageIcon');
+            const title = document.getElementById('messageTitle');
+            const text = document.getElementById('messageText');
+            const button = document.getElementById('messageButton');
+
+            // Set message text
+            text.textContent = message;
+
+            // Reset classes
+            messageBox.className = 'message-box';
+            
+            // Configure based on type
+            switch(type) {
+                case 'success':
+                    messageBox.classList.add('message-success');
+                    title.textContent = 'Erfolg';
+                    button.textContent = 'Verstanden';
+                    // Success checkmark icon
+                    icon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path>';
+                    break;
+                case 'error':
+                    messageBox.classList.add('message-error');
+                    title.textContent = 'Fehler';
+                    button.textContent = 'Schließen';
+                    // Error X icon
+                    icon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
+                    break;
+                case 'warning':
+                    messageBox.classList.add('message-warning');
+                    title.textContent = 'Achtung';
+                    button.textContent = 'OK';
+                    // Warning triangle icon
+                    icon.innerHTML = '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>';
+                    break;
+                default: // info
+                    messageBox.classList.add('message-info');
+                    title.textContent = 'Information';
+                    button.textContent = 'OK';
+                    // Info icon
+                    icon.innerHTML = '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>';
+            }
+
+            // Show modal with animation
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+
+            // Button click handler
+            const closeModal = () => {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+                button.removeEventListener('click', closeModal);
+                modal.removeEventListener('click', outsideClick);
+                document.removeEventListener('keydown', escapeHandler);
+            };
+
+            // Close on outside click
+            const outsideClick = (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            };
+
+            // Close on ESC key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            };
+
+            button.addEventListener('click', closeModal);
+            modal.addEventListener('click', outsideClick);
+            document.addEventListener('keydown', escapeHandler);
+        }
+
+        // Custom Confirmation Dialog
+        function showConfirm(message, title = 'Bestätigung') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const titleEl = document.getElementById('confirmTitle');
+                const textEl = document.getElementById('confirmText');
+                const cancelBtn = document.getElementById('confirmCancelBtn');
+                const okBtn = document.getElementById('confirmOkBtn');
+
+                // Set message
+                titleEl.textContent = title;
+                textEl.textContent = message;
+
+                // Show modal
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
+
+                // Close modal function
+                const closeModal = (result) => {
+                    modal.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 300);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    okBtn.removeEventListener('click', handleOk);
+                    modal.removeEventListener('click', outsideClick);
+                    document.removeEventListener('keydown', escapeHandler);
+                    resolve(result);
+                };
+
+                // Button handlers
+                const handleCancel = () => closeModal(false);
+                const handleOk = () => closeModal(true);
+
+                // Outside click handler
+                const outsideClick = (e) => {
+                    if (e.target === modal) {
+                        closeModal(false);
+                    }
+                };
+
+                // Escape key handler
+                const escapeHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        closeModal(false);
+                    }
+                };
+
+                cancelBtn.addEventListener('click', handleCancel);
+                okBtn.addEventListener('click', handleOk);
+                modal.addEventListener('click', outsideClick);
+                document.addEventListener('keydown', escapeHandler);
+            });
+        }
+
+        // Override native alert and confirm
+        window.alert = function(message) {
+            showMessage(message, 'info');
+        };
+
+        window.confirm = function(message) {
+            return showConfirm(message);
+        };
+    </script>
 </body>
 
 </html>
