@@ -49,7 +49,6 @@ class WeekMenuPlanner:
         WeekPlannerResult | None
             A WeekPlannerResult object containing the planned menu for the week, or None if planning is not possible.
         """
-        self._initialise_planning()
 
         if not self._plan_day_menu():
             return None
@@ -60,28 +59,26 @@ class WeekMenuPlanner:
         return self._planning_result
 
     def _plan_day_menu(self) -> bool:
-        # If the result object is not initialized, return False
-        if not self._planning_result:
-            return False
+        self._initialise_planning()
 
-        day_settings = self._days_of_the_week_to_plan.pop(0)
-        menu_to_choose_from = self._menu_filter(day_settings)
+        for day_settings in self._days_of_the_week_to_plan:
+            if not self._menu_filter(day_settings):
+                return False
 
-        if not menu_to_choose_from:
-            return False
+            menu_to_choose_from = self._menu_filter(day_settings)
 
-        menu_chosen = choice(menu_to_choose_from)
-        self._planning_result.daily_menus.append(
-            DayMenuInfo(
-                week_day_number=day_settings.week_day_number,
-                menu=menu_chosen,
-                effort_level_id=day_settings.effort_level_id,
-                to_take_away=day_settings.to_take_away,
+            if not menu_to_choose_from:
+                return False
+
+            menu_chosen = choice(menu_to_choose_from)
+            self._planning_result.daily_menus.append(
+                DayMenuInfo(
+                    week_day_number=day_settings.week_day_number,
+                    menu=menu_chosen,
+                    effort_level_id=day_settings.effort_level_id,
+                    to_take_away=day_settings.to_take_away,
+                )
             )
-        )
-
-        if self._days_of_the_week_to_plan:
-            return self._plan_day_menu()
 
         menu_id_set = frozenset(day_menu.menu.id for day_menu in self._planning_result.daily_menus if day_menu.menu.id)
 
@@ -92,9 +89,10 @@ class WeekMenuPlanner:
         if self._protein_goal_achieved():
             self._multiple_solution_set.add(menu_id_set)
             return True
-
-        self._initialise_planning()
-        return self._plan_day_menu()
+        try:
+            return self._plan_day_menu()
+        except RecursionError:
+            return False
 
     def _menu_filter(self, day_settings: DaySettings) -> list[MenuInfo]:
         menu_to_choose_from = [menu for menu in self._menus if menu.id and menu.id not in self._used_menu_ids]

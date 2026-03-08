@@ -129,7 +129,11 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     week_menu_planner = WeekMenuPlanner(menus, week_planner, used_menu_ids)
     week_planner_result = week_menu_planner.plan_week_menus()
     if not week_planner_result:
-        return {"message": "No valid week menu plan could be generated with the given settings and available menus."}
+        message = """\
+            Es konnte keine gültige Menüplanung gefunden werden.
+            Bitte passen Sie Ihre Einstellungen an und versuchen Sie es erneut.
+        """
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
     week_planner_result_dict = week_planner_result.model_dump()
     effort_levels = get_all_effort_levels()
 

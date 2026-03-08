@@ -205,6 +205,7 @@ def test_week_planner_multiple_solutions_with_different_results():
         len(result_list) == number_of_iterations
     )  # Expecting 10 different solutions due to randomness in menu selection
 
+
 def test_week_planner_enough_menus_but_already_in_use_no_solution():
     menus = load_menus_from_json("example/menu_collection_small.json")
     week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
@@ -217,3 +218,21 @@ def test_week_planner_enough_menus_but_already_in_use_no_solution():
     used_menu_ids = {1, 2, 3}
     planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
     assert planner.plan_week_menus() is None  # Expecting no solution to be found
+
+
+def test_week_planner_protein_too_small():
+    menus = load_menus_from_json("example/menu_collection.json")
+    week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
+    week_planner_settings.protein_goal = 10  # Set an unrealistically low protein goal to force no solution
+    used_menu_ids = set()
+    planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
+    assert planner.plan_week_menus() is None  # Expecting no solution to be found due to low protein goal
+
+
+def test_week_planner_protein_too_high():
+    menus = load_menus_from_json("example/menu_collection.json")
+    week_planner_settings = load_week_planner_settings_from_json("example/week_planner_settings_spring.json")
+    week_planner_settings.protein_goal = 1000  # Set an unrealistically high protein goal to force no solution
+    used_menu_ids = set()
+    planner = WeekMenuPlanner(menus, week_planner_settings, used_menu_ids)
+    assert planner.plan_week_menus() is None  # Expecting no solution to be found due to low protein goal
