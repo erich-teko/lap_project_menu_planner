@@ -1,6 +1,7 @@
 {
   "year": 2026,
   "week_number": 10,
+  "protein_goal": 150.0,
   "daily_menus": [
     {
       "week_day_number": 1,
