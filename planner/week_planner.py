@@ -38,7 +38,7 @@ class WeekMenuPlanner:
         )
         self._used_menu_ids = used_menu_ids
         self._days_of_the_week_to_plan: list[DaySettings] = []
-        self._planning_result: WeekPlannerResult | None = None
+        self._daily_menus_result: list[DayMenuInfo] = []
         self._multiple_solution_set: set[frozenset[int]] = set()
 
     def plan_week_menus(self) -> WeekPlannerResult | None:
@@ -53,10 +53,14 @@ class WeekMenuPlanner:
         if not self._plan_day_menu():
             return None
 
-        if self._planning_result:
-            self._planning_result.daily_menus.sort(key=lambda day_menu: day_menu.week_day_number)
+        self._daily_menus_result.sort(key=lambda day_menu: day_menu.week_day_number)
 
-        return self._planning_result
+        return WeekPlannerResult(
+            year=self._week_planner_settings.year,
+            week_number=self._week_planner_settings.week_number,
+            protein_goal=self._week_planner_settings.protein_goal,
+            daily_menus=self._daily_menus_result,
+        )
 
     def _plan_day_menu(self) -> bool:
         self._initialise_planning()
@@ -71,19 +75,18 @@ class WeekMenuPlanner:
                 return False
 
             menu_chosen = choice(menu_to_choose_from)
-            self._planning_result.daily_menus.append(
+            self._daily_menus_result.append(
                 DayMenuInfo(
                     week_day_number=day_settings.week_day_number,
                     menu=menu_chosen,
-                    effort_level_id=day_settings.effort_level_id,
+                    effort_level_id=day_settings.effort_level_id,  # type: ignore
                     to_take_away=day_settings.to_take_away,
                 )
             )
 
-        menu_id_set = frozenset(day_menu.menu.id for day_menu in self._planning_result.daily_menus if day_menu.menu.id)
+        menu_id_set = frozenset(day_menu.menu.id for day_menu in self._daily_menus_result if day_menu.menu.id)
 
         if menu_id_set in self._multiple_solution_set:
-            self._initialise_planning()
             return self._plan_day_menu()
 
         if self._protein_goal_achieved():
@@ -102,18 +105,18 @@ class WeekMenuPlanner:
         menu_to_choose_from = [menu for menu in menu_to_choose_from if self._season_number in menu.season_ids]
         if day_settings.to_take_away:
             menu_to_choose_from = [menu for menu in menu_to_choose_from if menu.to_take_away]
-        if self._planning_result:
+        if self._daily_menus_result:
             menu_to_choose_from = [
                 menu
                 for menu in menu_to_choose_from
-                if menu.category_id not in [day_menu.menu.category_id for day_menu in self._planning_result.daily_menus]
+                if menu.category_id not in [day_menu.menu.category_id for day_menu in self._daily_menus_result]
             ]
         return menu_to_choose_from
 
     def _get_protein_total(self) -> float:
-        if not self._planning_result:
+        if not self._daily_menus_result:
             return 0.0
-        return sum((day_menu.menu.protein for day_menu in self._planning_result.daily_menus), 0.0)
+        return sum((day_menu.menu.protein for day_menu in self._daily_menus_result), 0.0)
 
     def _protein_goal_achieved(self) -> bool:
         protein_goal = self._week_planner_settings.protein_goal
@@ -123,12 +126,7 @@ class WeekMenuPlanner:
     def _initialise_planning(self) -> None:
         self._days_of_the_week_to_plan = deepcopy(self._week_planner_settings.daily_menus)
         self._days_of_the_week_to_plan.sort(key=self._sort_by_available_menus)
-        self._planning_result = WeekPlannerResult(
-            year=self._week_planner_settings.year,
-            week_number=self._week_planner_settings.week_number,
-            protein_goal=self._week_planner_settings.protein_goal,
-            daily_menus=[],
-        )
+        self._daily_menus_result = []
 
     def _sort_by_available_menus(self, day_settings: DaySettings) -> tuple[int, bool, int]:
         return (len(self._menu_filter(day_settings)), day_settings.to_take_away == False, day_settings.week_day_number)
