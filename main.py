@@ -108,7 +108,7 @@ async def week_planner_page(request: Request):
 async def create_week_planner_api(planner_settings: WeekPlannerSettings):
     # Convert Pydantic models to dataclass instances
     daily_menus = []
-    for day_settings in planner_settings.daily_menus:
+    for day_settings in planner_settings.daily_settings:
         daily_menus.append(
             DaySettings(
                 week_day_number=day_settings.week_day_number,
@@ -121,7 +121,7 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
         year=planner_settings.year,
         week_number=planner_settings.week_number,
         protein_goal=planner_settings.protein_goal,
-        daily_menus=daily_menus,
+        daily_settings=daily_menus,
     )
 
     menus = get_menu_collection()

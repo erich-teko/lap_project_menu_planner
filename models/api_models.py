@@ -13,7 +13,7 @@ class WeekPlannerSettings(BaseModel):
     year: int
     week_number: int
     protein_goal: float
-    daily_menus: list[DaySettings]  # List of 7 DaySettings objects, one for each day of the week
+    daily_settings: list[DaySettings]  # List of 7 DaySettings objects, one for each day of the week
 
 
 def create_default_week_planner() -> WeekPlannerSettings:
@@ -23,7 +23,7 @@ def create_default_week_planner() -> WeekPlannerSettings:
         year=current_year,
         week_number=current_week + 1,
         protein_goal=25.0 * 7,  # Default to 25g protein per day for a week
-        daily_menus=[DaySettings(week_day_number=i) for i in range(1, 8)],
+        daily_settings=[DaySettings(week_day_number=i) for i in range(1, 8)],
     )
 
 

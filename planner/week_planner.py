@@ -124,7 +124,7 @@ class WeekMenuPlanner:
         return protein_goal * 0.9 <= total_protein <= protein_goal * 1.1
 
     def _initialise_planning(self) -> None:
-        self._days_of_the_week_to_plan = deepcopy(self._week_planner_settings.daily_menus)
+        self._days_of_the_week_to_plan = deepcopy(self._week_planner_settings.daily_settings)
         self._days_of_the_week_to_plan.sort(key=self._sort_by_available_menus)
         self._daily_menus_result = []
 

@@ -82,7 +82,7 @@ def test_week_planner_in_spring_season():
         day_setting = next(
             (
                 setting
-                for setting in week_planner_settings.daily_menus
+                for setting in week_planner_settings.daily_settings
                 if setting.week_day_number == day_menu.week_day_number
             ),
             None,
@@ -111,7 +111,7 @@ def test_week_planner_in_summer_season():
         day_setting = next(
             (
                 setting
-                for setting in week_planner_settings.daily_menus
+                for setting in week_planner_settings.daily_settings
                 if setting.week_day_number == day_menu.week_day_number
             ),
             None,
@@ -140,7 +140,7 @@ def test_week_planner_in_autumn_season():
         day_setting = next(
             (
                 setting
-                for setting in week_planner_settings.daily_menus
+                for setting in week_planner_settings.daily_settings
                 if setting.week_day_number == day_menu.week_day_number
             ),
             None,
@@ -169,7 +169,7 @@ def test_week_planner_in_winter_season():
         day_setting = next(
             (
                 setting
-                for setting in week_planner_settings.daily_menus
+                for setting in week_planner_settings.daily_settings
                 if setting.week_day_number == day_menu.week_day_number
             ),
             None,

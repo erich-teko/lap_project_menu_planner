@@ -2,7 +2,7 @@
   "year": 2026,
   "week_number": 10,
   "protein_goal": 180,
-  "daily_menus": [
+  "daily_settings": [
     {
       "week_day_number": 1,
       "effort_level_id": 1,
