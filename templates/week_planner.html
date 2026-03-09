@@ -219,7 +219,7 @@
             year: parseInt(formData.get('year')),
             week_number: parseInt(formData.get('week_number')),
             protein_goal: parseFloat(formData.get('protein_goal')),
-            daily_menus: dailyMenus
+            daily_settings: dailyMenus
         };
         
         console.log('Submitting week planner:', weekPlannerData);
@@ -337,18 +337,38 @@
     
     function updateSaveButtonState() {
         const saveButton = document.querySelector('button[onclick="saveWeekPlanner()"]');
-        if (saveButton) {
-            if (isLoadedFromDatabase) {
-                saveButton.disabled = true;
-                saveButton.style.opacity = '0.5';
-                saveButton.style.cursor = 'not-allowed';
-                saveButton.title = 'Dieser Wochenplan wurde bereits gespeichert';
-            } else {
-                saveButton.disabled = false;
-                saveButton.style.opacity = '1';
-                saveButton.style.cursor = 'pointer';
-                saveButton.title = 'Wochenplanung in der Datenbank speichern';
-            }
+        const resetButton = document.querySelector('button[onclick="resetForm()"]');
+        const startPlannerButton = document.querySelector('button[type="submit"]');
+        if (isLoadedFromDatabase) {
+            startPlannerButton.disabled = true;
+            startPlannerButton.style.opacity = '0.5';
+            startPlannerButton.style.cursor = 'not-allowed';
+            startPlannerButton.title = 'Dieser Wochenplan wurde bereits gespeichert';
+            
+            resetButton.disabled = true;
+            resetButton.style.opacity = '0.5';
+            resetButton.style.cursor = 'not-allowed';
+            resetButton.title = 'Dieser Wochenplan wurde bereits gespeichert';
+            
+            saveButton.disabled = true;
+            saveButton.style.opacity = '0.5';
+            saveButton.style.cursor = 'not-allowed';
+            saveButton.title = 'Dieser Wochenplan wurde bereits gespeichert';
+        } else {
+            startPlannerButton.disabled = false;
+            startPlannerButton.style.opacity = '1';
+            startPlannerButton.style.cursor = 'pointer';
+            startPlannerButton.title = 'Wochenplanung erstellen';
+            
+            resetButton.disabled = false;
+            resetButton.style.opacity = '1';
+            resetButton.style.cursor = 'pointer';
+            resetButton.title = 'Formular zurücksetzen';
+            
+            saveButton.disabled = false;
+            saveButton.style.opacity = '1';
+            saveButton.style.cursor = 'pointer';
+            saveButton.title = 'Wochenplanung in der Datenbank speichern';
         }
     }
 </script>
