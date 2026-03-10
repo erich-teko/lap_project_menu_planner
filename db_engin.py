@@ -1,4 +1,5 @@
 import json
+from os import makedirs
 
 from pydantic import TypeAdapter
 from sqlmodel import Session, SQLModel, create_engine, select
@@ -7,7 +8,8 @@ from exceptions import WeekPlannerSaveException
 from models.api_models import DayMenuInfo, MenuInfo, WeekPlannerResult
 from models.db_models import *
 
-sqlite_file_name = "database.db"
+makedirs("data", exist_ok=True)
+sqlite_file_name = "data/database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}
