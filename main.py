@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
@@ -134,14 +136,7 @@ async def create_week_planner_api(planner_settings: WeekPlannerSettings):
             Bitte passen Sie Ihre Einstellungen an und versuchen Sie es erneut.
         """
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=message)
-    week_planner_result_dict = week_planner_result.model_dump()
-    effort_levels = get_all_effort_levels()
-
-    for day_menu in week_planner_result_dict["daily_menus"]:
-        effort_level = next((level for level in effort_levels if level.id == day_menu["effort_level_id"]), None)
-        day_menu["effort_level_name"] = effort_level.name if effort_level else "-"
-
-    return week_planner_result_dict
+    return _extend_week_planner_result_for_display(week_planner_result)
 
 
 @menu_planner.post("/api/menus/import", status_code=status.HTTP_201_CREATED)
@@ -163,9 +158,20 @@ async def save_planned_week(week_planner_result: WeekPlannerResult):
 
 @menu_planner.get("/api/week-planner/{year}/{week_number}")
 async def get_planner_result(year: int, week_number: int):
-    planner_result = get_planner_result_by_year_and_week(year, week_number)
-    if not planner_result:
+    week_planner_result = get_planner_result_by_year_and_week(year, week_number)
+    if not week_planner_result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Keine Planung für die angegebene Woche gefunden."
         )
-    return planner_result.model_dump()
+    return _extend_week_planner_result_for_display(week_planner_result)
+
+
+def _extend_week_planner_result_for_display(week_planner_result: WeekPlannerResult) -> dict[str, Any]:
+    week_planner_result_dict = week_planner_result.model_dump()
+    effort_levels = get_all_effort_levels()
+
+    for day_menu in week_planner_result_dict["daily_menus"]:
+        effort_level = next((level for level in effort_levels if level.id == day_menu["effort_level_id"]), None)
+        day_menu["effort_level_name"] = effort_level.name if effort_level else "-"
+
+    return week_planner_result_dict
