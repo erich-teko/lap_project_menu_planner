@@ -66,11 +66,7 @@ class WeekMenuPlanner:
         self._initialise_planning()
 
         for day_settings in self._days_of_the_week_to_plan:
-            if not self._menu_filter(day_settings):
-                return False
-
             menu_to_choose_from = self._menu_filter(day_settings)
-
             if not menu_to_choose_from:
                 return False
 
