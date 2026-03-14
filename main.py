@@ -5,6 +5,7 @@ from fastapi.concurrency import asynccontextmanager
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from db_engin import (
     create_db_and_tables,
@@ -37,6 +38,10 @@ async def lifespan(app: FastAPI):
 
 
 menu_planner = FastAPI(lifespan=lifespan)
+
+# Add ProxyHeadersMiddleware to trust X-Forwarded-* headers from nginx
+menu_planner.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
 menu_planner.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
