@@ -162,15 +162,20 @@ def get_menus_with_details() -> list[dict]:
                 if season:
                     season_names.append(season.name)
 
+            season_ids = [link.season_id for link in season_links]
+
             result.append(
                 {
                     "id": menu.id,
                     "name": menu.name,
                     "description": menu.description,
+                    "category_id": menu.category_id,
                     "category_name": category_name,
+                    "effort_level_id": menu.effort_level_id,
                     "effort_name": effort_name,
                     "protein": menu.protein,
                     "to_take_away": menu.to_take_away,
+                    "season_ids": season_ids,
                     "season_names": ", ".join(season_names) if season_names else None,
                 }
             )

@@ -389,6 +389,51 @@ body {
     color: #383d41;
 }
 
+/* Action Button Styles */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-edit {
+    background: #ebf5fb;
+    color: #2980b9;
+}
+
+.btn-edit:hover {
+    background: #2980b9;
+    color: white;
+}
+
+.btn-delete {
+    background: #fdedec;
+    color: #c0392b;
+}
+
+.btn-delete:hover {
+    background: #c0392b;
+    color: white;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
