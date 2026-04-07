@@ -10,6 +10,7 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from db_engin import (
     create_db_and_tables,
     create_menu,
+    delete_menu,
     get_all_effort_levels,
     get_all_menu_categories,
     get_all_seasons,
@@ -20,6 +21,7 @@ from db_engin import (
     get_planner_result_by_year_and_week,
     import_example_menu_collection,
     save_week_planner_result,
+    update_menu,
 )
 from exceptions import WeekPlannerSaveException
 from models.api_models import DaySettings, MenuInfo, WeekPlannerResult, WeekPlannerSettings, create_default_week_planner
@@ -85,6 +87,33 @@ async def create_menu_api(menu_data: MenuInfo):
     try:
         created_menu = create_menu(menu, menu_data.season_ids)
         return {"id": created_menu.id, "name": created_menu.name}
+    except ValueError as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
+
+
+@menu_planner.put("/api/menus/{menu_id}", status_code=status.HTTP_200_OK)
+async def update_menu_api(menu_data: MenuInfo):
+    menu = Menu(
+        id=menu_data.id,
+        name=menu_data.name,
+        description=menu_data.description,
+        category_id=menu_data.category_id,
+        effort_level_id=menu_data.effort_level_id,
+        to_take_away=menu_data.to_take_away,
+        protein=menu_data.protein,
+    )
+
+    try:
+        updated_menu = update_menu(menu, menu_data.season_ids)
+        return {"id": updated_menu.id, "name": updated_menu.name}
+    except ValueError as exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
+
+
+@menu_planner.delete("/api/menus/{menu_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_menu_api(menu_id: int):
+    try:
+        delete_menu(menu_id)
     except ValueError as exception:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exception))
 

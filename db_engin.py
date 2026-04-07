@@ -90,6 +90,49 @@ def create_menu(menu: Menu, season_ids: list[int]) -> Menu:
         return menu
 
 
+def update_menu(menu: Menu, season_ids: list[int]) -> Menu:
+    with Session(engine) as session:
+        existing_menu = session.get(Menu, menu.id)
+        if not existing_menu:
+            raise ValueError(f"Menü mit der ID '{menu.id}' existiert nicht.")
+        existing_menu.name = menu.name
+        existing_menu.description = menu.description
+        existing_menu.category_id = menu.category_id
+        existing_menu.effort_level_id = menu.effort_level_id
+        existing_menu.protein = menu.protein
+        existing_menu.to_take_away = menu.to_take_away
+        session.commit()
+
+        if menu.id:
+            menu_season_links = session.exec(select(MenuSeasonLink).where(MenuSeasonLink.menu_id == menu.id)).all()
+            existing_season_ids = {link.season_id for link in menu_season_links}
+            for link in menu_season_links:
+                if link.season_id in season_ids:
+                    continue  # Keep existing link if season_id is still in the list
+                session.delete(link)
+
+            for season_id in season_ids:
+                if season_id in existing_season_ids:
+                    continue  # Skip adding link if it already exists
+                menu_season_link = MenuSeasonLink(menu_id=menu.id, season_id=season_id)
+                session.add(menu_season_link)
+            session.commit()
+        session.refresh(existing_menu)
+        return existing_menu
+
+
+def delete_menu(menu_id: int):
+    with Session(engine) as session:
+        menu = session.get(Menu, menu_id)
+        if not menu:
+            raise ValueError(f"Menü mit der ID '{menu_id}' existiert nicht.")
+        menu_season_links = session.exec(select(MenuSeasonLink).where(MenuSeasonLink.menu_id == menu.id)).all()
+        for menu_season_link in menu_season_links:
+            session.delete(menu_season_link)
+        session.delete(menu)
+        session.commit()
+
+
 def get_menus_with_details() -> list[dict]:
     """Get all menus with their related category, effort level, and season information."""
     with Session(engine) as session:
