@@ -1,3 +1,9 @@
+# Archived!
+
+## This project has been archived.  
+## The repository has been moved to Codeberg and will continue to be developed there!  
+## https://codeberg.org/tazzy/lap_project_menu_planner
+
 # lap_project_menu_planner
 
 ## TEKO LAP Project Work Weekly Menu Planner
